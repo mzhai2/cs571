@@ -18,6 +18,8 @@ package edu.emory.mathcs.nlp.component.dep;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import edu.emory.mathcs.nlp.component.util.eval.Eval;
 import edu.emory.mathcs.nlp.component.util.state.NLPState;
@@ -52,13 +54,13 @@ public class DEPState<N extends DEPNode> extends NLPState<N>
 	{
 		oracle = Arrays.stream(nodes).map(n -> n.clearDependencies()).toArray(DEPArc[]::new);
 	}
-	
+
 	@Override
 	public String getOraclePrediction()
 	{
-		// left-arc: input is the head of stack
 		DEPArc o = oracle[stack.topInt()];
-		
+
+		// left-arc: input is the head of stack
 		if (o.isNode(getInput(0)))
 			return LEFT_ARC + o.getLabel();
 		
@@ -74,7 +76,7 @@ public class DEPState<N extends DEPNode> extends NLPState<N>
 		
 		return SHIFT;
 	}
-	
+
 	private boolean isOracleReduce()
 	{
 		DEPNode stack = getStack(0);
@@ -88,7 +90,61 @@ public class DEPState<N extends DEPNode> extends NLPState<N>
 		
 		return true;
 	}
-	
+
+//	================================ DYNAMIC ORACLE ======================================
+
+
+	@Override
+	public Set<String> getDynamicOraclePrediction() {
+		Set<String> valids = new HashSet<>();
+
+		DEPArc o = oracle[stack.topInt()];
+
+		if (o.isNode(getInput(0)) || !depInBuffer(o))
+			valids.add(LEFT_ARC);
+
+		o = oracle[input];
+
+		if (o.isNode(getStack(0)) || (!depInBuffer(o) && (!depInstack(o))))
+			valids.add(RIGHT_ARC);
+
+		if (isOracleReduce())
+			valids.add(REDUCE);
+
+		if (depInstack(o) || headInStack(o) )
+			valids.add(SHIFT);
+		return valids;
+	}
+
+	private boolean depInBuffer(DEPArc o) {
+		for (int i = input; i<nodes.length;i++) {
+			N n = nodes[i];
+			if (o.isNode(n))
+				return true;
+		}
+		return false;
+	}
+	private boolean depInstack(DEPArc o) {
+		for (int i=0; i <stack.size(); i++)
+			if (o.isNode(getStack(i)))
+				return true;
+		return false;
+	}
+
+	private boolean headInStack(DEPArc o) {
+		for (int i=0; i <stack.size(); i++)
+			if (oracle[stack.getInt(i)].isNode(o.getNode()))
+				return true;
+		return false;
+	}
+
+//	==================================== SEARCHING =========================================
+
+	@Override
+	public StringPrediction[] validLabels() {
+
+	}
+
 //	====================================== TRANSITION ======================================
 	
 	@Override
@@ -96,7 +152,7 @@ public class DEPState<N extends DEPNode> extends NLPState<N>
 	{
 		String label = prediction.getLabel();
 //		System.out.println(label+" "+stack.toString()+" "+input);
-		
+
 		if (label.startsWith(LEFT_ARC))
 		{
 			DEPNode s = getStack(0);
@@ -125,6 +181,7 @@ public class DEPState<N extends DEPNode> extends NLPState<N>
 			if (stack.size() == 1)
 				label = SHIFT;
 		}
+
 		
 		switch (label)
 		{
@@ -181,7 +238,7 @@ public class DEPState<N extends DEPNode> extends NLPState<N>
 		{
 			node = nodes [i];
 			gold = oracle[i];
-			
+
 			if (gold.isNode(node.getHead()))
 			{
 				uas++;
@@ -189,9 +246,9 @@ public class DEPState<N extends DEPNode> extends NLPState<N>
 			}
 		}
 
-		((DEPEval)eval).add(las, uas, nodes.length-1);
+		((DEPEval)eval).add(las, uas, nodes.length - 1);
 	}
-	
+
 //	============================== UTILITIES ==============================
 	
 	public boolean isFirst(N node)
@@ -203,4 +260,6 @@ public class DEPState<N extends DEPNode> extends NLPState<N>
 	{
 		return nodes[nodes.length-1] == node;
 	}
+
+
 }

@@ -18,6 +18,7 @@ package edu.emory.mathcs.nlp.component.dep;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Set;
 
 import edu.emory.mathcs.nlp.component.util.NLPComponent;
 import edu.emory.mathcs.nlp.learn.model.StringModel;
@@ -63,5 +64,11 @@ public class DEPParser<N extends DEPNode> extends NLPComponent<N,DEPState<N>>
 	protected void addInstance(String label, StringVector vector)
 	{
 		models[0].addInstance(new StringInstance(label, vector));
+	}
+	@Override
+	protected void addInstance(Set<String> label, StringVector vector)
+	{
+		for (String l : label)
+			models[0].addInstance(new StringInstance(l, vector));
 	}
 }

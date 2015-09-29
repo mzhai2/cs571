@@ -19,6 +19,8 @@ import edu.emory.mathcs.nlp.common.util.DSUtils;
 import edu.emory.mathcs.nlp.component.util.eval.Eval;
 import edu.emory.mathcs.nlp.learn.util.StringPrediction;
 
+import java.util.Set;
+
 /**
  * @author Jinho D. Choi ({@code jinho.choi@emory.edu})
  */
@@ -36,7 +38,9 @@ public abstract class NLPState<N>
 	
 	/** @return the oracle prediction of the current state. */
 	public abstract String getOraclePrediction();
-	
+
+	public abstract Set<String> getDynamicOraclePrediction();
+
 	/** Applies the prediction and moves onto the next state */
 	public abstract void next(StringPrediction prediction);
 	
@@ -52,4 +56,6 @@ public abstract class NLPState<N>
 		index += window;
 		return DSUtils.isRange(nodes, index) ? nodes[index] : null;
 	}
+
+	public abstract StringPrediction[] validLabels();
 }
