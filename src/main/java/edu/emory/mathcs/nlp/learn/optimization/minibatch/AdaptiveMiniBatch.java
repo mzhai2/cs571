@@ -77,22 +77,24 @@ public abstract class AdaptiveMiniBatch extends OnlineOptimizer
 		
 		if (isAveraged() && steps > 0) average();
 
-		float[] w = weight_vector.toArray();
-		for (int i=0; i<w.length; i++) {
-			if (w[i] == 0) {
-				removedFeatures.add(i);
-			}
-		}
+//		float[] w = weight_vector.toArray();
+//		for (int i=0; i<w.length; i++) {
+//			if (w[i] == 0) {
+//				removedFeatures.add(i);
+//			}
+//		}
 	}
 
 	private void regularizeL1() {
 		float[] w = weight_vector.toArray();
 		for (int i=0; i<w.length; i++) {
 			float postR;
-			if (w[i] > 0)
-				postR = Math.max(0, w[i] - l1delta);
+			if (Math.abs(w[i]) < l1delta)
+				postR = 0;
+			else if (w[i] > 0)
+				postR = w[i] - l1delta;
 			else
-				postR = Math.min(0, w[i] + l1delta);
+				postR = w[i] + l1delta;
 			w[i] = postR;
 		}
 	}

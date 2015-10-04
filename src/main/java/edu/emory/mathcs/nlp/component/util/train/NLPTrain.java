@@ -20,6 +20,7 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.function.Consumer;
 
+import edu.emory.mathcs.nlp.learn.weight.WeightVector;
 import org.kohsuke.args4j.Option;
 
 import edu.emory.mathcs.nlp.common.util.BinUtils;
@@ -102,7 +103,8 @@ public abstract class NLPTrain<N,S extends NLPState<N>>
 			BinUtils.LOG.info(String.format("\nTraining: %d\n\n", iter));
 			component.setFlag(iter == 0 ? NLPFlag.TRAIN : NLPFlag.AGGREGATE);
 			prevScore = currScore;
-			currScore = trainIter(reader, trainFiles, developFiles, component, configuration, iter);
+			Optimizer[] optimizers = configuration.getOptimizers(models);
+			currScore = trainIter(reader, trainFiles, developFiles, component, configuration, iter, optimizers);
 
 			if (dagger == null) break;	// no aggregating
 			
@@ -117,15 +119,21 @@ public abstract class NLPTrain<N,S extends NLPState<N>>
 				bestScore = currScore;
 				bestIter  = iter;
 			}
+
+			float[] w = component.getModels()[0].getWeightVector().toArray();
+			for (int f=0; f<w.length; f++) {
+				if (w[f] == 0) {
+					optimizers[0].getRemovedFeatures().add(f);
+				}
+			}
 		}
 		
 		BinUtils.LOG.info(String.format("\nFinal score: %5.2f\n", bestScore));
 	}
 	
-	public double trainIter(TSVReader<N> reader, List<String> trainFiles, List<String> developFiles, NLPComponent<N,?> component, NLPConfig<N> configuration, int iter)
+	public double trainIter(TSVReader<N> reader, List<String> trainFiles, List<String> developFiles, NLPComponent<N, ?> component, NLPConfig<N> configuration, int iter, Optimizer[] optimizers)
 	{
 		StringModel[] models = component.getModels();
-		Optimizer[] optimizers = configuration.getOptimizers(models);
 		double score = 0;
 
 		for (int i=0; i<optimizers.length; i++)

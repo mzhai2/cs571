@@ -204,7 +204,7 @@ public abstract class NLPComponent<N,S extends NLPState<N>> implements Serializa
 	protected StringPrediction getPrediction(S state, StringVector vector, int epoch)
 	{
 		if (isAggregate())
-			if (Math.random() > .3 + .2*epoch) // as number of epochs goes up, return oracle less
+			if (Math.random() > .3 + .15*epoch) // as number of epochs goes up, return oracle less
 				return new StringPrediction(state.getOraclePrediction(), 1);
 			else
 				return getModelPrediction(state, vector);
