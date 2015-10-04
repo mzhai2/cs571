@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import edu.emory.mathcs.nlp.common.util.DSUtils;
 import edu.emory.mathcs.nlp.common.util.FastUtils;
@@ -58,10 +59,30 @@ public class FeatureMap implements Serializable
 	{
 		Object2IntMap<String> countMap;
 		int type;
+
+		for (Entry<Integer,Object2IntMap<String>> e : count_map.entrySet())
+		{
+			type = e.getKey();
+			countMap = e.getValue();
+
+			expandTypes(type);
+			expandFeatures(countMap, index_map.get(type), cutoff);
+		}
+
+		count_map = new Int2ObjectOpenHashMap<>();
+		return feature_size;
+	}
+
+	public int expand(int cutoff, Set<Integer> removedFeatures)
+	{
+		Object2IntMap<String> countMap;
+		int type;
 		
 		for (Entry<Integer,Object2IntMap<String>> e : count_map.entrySet())
 		{
 			type = e.getKey();
+			if (removedFeatures.contains(type))
+				continue;
 			countMap = e.getValue();
 			
 			expandTypes(type);

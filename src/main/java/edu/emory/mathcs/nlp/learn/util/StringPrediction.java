@@ -27,7 +27,7 @@ public class StringPrediction implements Serializable
 	private String label;
 	private double score;
 	
-	public StringPrediction(String label, double score)
+	public  StringPrediction(String label, double score)
 	{
 		set(label, score);
 	}

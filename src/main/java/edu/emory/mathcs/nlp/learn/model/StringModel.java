@@ -16,11 +16,7 @@
 package edu.emory.mathcs.nlp.learn.model;
 
 import java.io.Serializable;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 import edu.emory.mathcs.nlp.learn.util.Instance;
 import edu.emory.mathcs.nlp.learn.util.Prediction;
@@ -44,6 +40,9 @@ public class StringModel implements Serializable
 	private FeatureMap            feature_map;
 	private WeightVector          weight_vector;
 	private float                 bias;
+	private int labelCutoff;
+	private int featureCutoff;
+	private boolean reset;
 	
 	public StringModel(WeightVector vector)
 	{
@@ -80,14 +79,63 @@ public class StringModel implements Serializable
 	{
 		return instance_deque;
 	}
-	
+
+	public boolean isReset() {
+		return reset;
+	}
+
+	public int getLabelCutoff() {
+		return labelCutoff;
+	}
+
+	public int getFeatureCutoff() {
+		return featureCutoff;
+	}
+
 	public List<Instance> getInstanceList()
 	{
 		return instance_list;
 	}
-	
 	public void vectorize(int labelCutoff, int featureCutoff, boolean reset)
 	{
+		this.reset = reset;
+		this.labelCutoff = labelCutoff;
+		this.featureCutoff = featureCutoff;
+		instance_list = new ArrayList<>();
+		StringInstance instance;
+		int labelIndex;
+
+		// filtering
+		if (reset)
+		{
+			label_map  .initIndices();
+			feature_map.initIndices();
+		}
+
+		label_map  .expand(labelCutoff);
+		feature_map.expand(featureCutoff);
+
+		if (reset)	weight_vector.init  (label_map.size(), feature_map.size());
+		else		weight_vector.expand(label_map.size(), feature_map.size());
+
+		// vectorizing
+		while (!instance_deque.isEmpty())
+		{
+			instance   = instance_deque.poll();
+			labelIndex = label_map.indexOf(instance.getLabel());
+
+			if (labelIndex >= 0)
+				instance_list.add(new Instance(labelIndex, toSparseVector(instance.getVector())));
+		}
+
+		instance_deque = new ArrayDeque<>();
+	}
+
+	public void vectorize(int labelCutoff, int featureCutoff, boolean reset, Set<Integer> removedFeatures)
+	{
+		this.reset = reset;
+		this.labelCutoff = labelCutoff;
+		this.featureCutoff = featureCutoff;
 		instance_list = new ArrayList<>();
 		StringInstance instance;
 		int labelIndex;
@@ -100,7 +148,7 @@ public class StringModel implements Serializable
 		}
 		
 		label_map  .expand(labelCutoff);
-		feature_map.expand(featureCutoff);
+		feature_map.expand(featureCutoff, removedFeatures);
 		
 		if (reset)	weight_vector.init  (label_map.size(), feature_map.size());
 		else		weight_vector.expand(label_map.size(), feature_map.size());

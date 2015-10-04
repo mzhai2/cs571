@@ -15,7 +15,9 @@
  */
 package edu.emory.mathcs.nlp.learn.optimization.minibatch;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.emory.mathcs.nlp.common.util.MathUtils;
 import edu.emory.mathcs.nlp.learn.optimization.OnlineOptimizer;
@@ -34,7 +36,8 @@ public abstract class AdaptiveMiniBatch extends OnlineOptimizer
 	protected WeightVector diagonals;
 	protected WeightVector gradients;
 	protected int batch_size;
-	
+
+
 	public AdaptiveMiniBatch(WeightVector weightVector, double batchRatio, boolean average, double learningRate)
 	{
 		super(weightVector, average, learningRate);
@@ -73,8 +76,27 @@ public abstract class AdaptiveMiniBatch extends OnlineOptimizer
 		}
 		
 		if (isAveraged() && steps > 0) average();
+
+		float[] w = weight_vector.toArray();
+		for (int i=0; i<w.length; i++) {
+			if (w[i] == 0) {
+				removedFeatures.add(i);
+			}
+		}
 	}
-	
+
+	private void regularizeL1() {
+		float[] w = weight_vector.toArray();
+		for (int i=0; i<w.length; i++) {
+			float postR;
+			if (w[i] > 0)
+				postR = Math.max(0, w[i] - l1delta);
+			else
+				postR = Math.min(0, w[i] + l1delta);
+			w[i] = postR;
+		}
+	}
+
 	private void average()
 	{
 		float[] w = weight_vector .toArray();
@@ -105,6 +127,7 @@ public abstract class AdaptiveMiniBatch extends OnlineOptimizer
 		normalizeGraidents();
 		updateDiagonals();
 		updateWeightVector();
+		regularizeL1();
 		if (isAveraged()) updateAverageVector();
 
 		batch_size = 0;
@@ -130,7 +153,7 @@ public abstract class AdaptiveMiniBatch extends OnlineOptimizer
 		float[] w = weight_vector.toArray();
 		float[] d = diagonals.toArray();
 		float[] g = gradients.toArray();
- 		
+
 		for (int i=0; i<w.length; i++)
 			w[i] += learning_rate / (epsilon + Math.sqrt(d[i])) * g[i];
 	}

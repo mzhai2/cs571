@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Set;
 
 import edu.emory.mathcs.nlp.component.util.eval.Eval;
 import edu.emory.mathcs.nlp.component.util.feature.FeatureTemplate;
@@ -155,7 +156,7 @@ public abstract class NLPComponent<N,S extends NLPState<N>> implements Serializa
 		
 		while (!state.isTerminate())
 		{
-			StringVector vector = extractFeatures(state);
+			StringVector vector = extractFeatures();
 			if (isTrainOrAggregate()) addInstance(state.getOraclePrediction(), vector);
 			StringPrediction label = getPrediction(state, vector);
 			state.next(label);
@@ -171,15 +172,29 @@ public abstract class NLPComponent<N,S extends NLPState<N>> implements Serializa
 
 		while (!state.isTerminate())
 		{
-			StringVector vector = extractFeatures(state);
+			StringVector vector = extractFeatures();
 			if (isTrainOrAggregate()) addInstance(state.getOraclePrediction(), vector);
 			StringPrediction label = getPrediction(state, vector, epoch);
 			state.next(label);
 		}
-
 		if (isEvaluate()) state.evaluate(eval);
 	}
-	
+	public void process(N[] nodes, int epoch, Set<Integer> removedFeatures)
+	{
+		S state = createState(nodes);
+		feature_template.setState(state);
+		if (!isDecode()) state.saveOracle();
+
+		while (!state.isTerminate())
+		{
+			StringVector vector = extractFeatures(removedFeatures);
+			if (isTrainOrAggregate()) addInstance(state.getOraclePrediction(), vector);
+			StringPrediction label = getPrediction(state, vector, epoch);
+			state.next(label);
+		}
+		if (isEvaluate()) state.evaluate(eval);
+	}
+
 	/** @return the oracle prediction for training; otherwise, the model predict. */
 	protected StringPrediction getPrediction(S state, StringVector vector)
 	{
@@ -189,7 +204,7 @@ public abstract class NLPComponent<N,S extends NLPState<N>> implements Serializa
 	protected StringPrediction getPrediction(S state, StringVector vector, int epoch)
 	{
 		if (isAggregate())
-			if (Math.random() > .2*epoch) // as number of epochs goes up, return oracle less
+			if (Math.random() > .3 + .2*epoch) // as number of epochs goes up, return oracle less
 				return new StringPrediction(state.getOraclePrediction(), 1);
 			else
 				return getModelPrediction(state, vector);
@@ -200,9 +215,15 @@ public abstract class NLPComponent<N,S extends NLPState<N>> implements Serializa
 
 	}
 
+	protected StringVector extractFeatures(Set<Integer> removedFeatures)
+	{
+		return feature_template.extractFeatures(removedFeatures);
+	}
+
 	/** @return the vector consisting of all features extracted from the state. */
-	protected StringVector extractFeatures(S state)
+	protected StringVector extractFeatures()
 	{
 		return feature_template.extractFeatures();
 	}
+
 }

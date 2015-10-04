@@ -15,7 +15,9 @@
  */
 package edu.emory.mathcs.nlp.learn.optimization;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.emory.mathcs.nlp.common.util.DSUtils;
 import edu.emory.mathcs.nlp.learn.util.Instance;
@@ -28,11 +30,15 @@ public abstract class Optimizer
 {
 	protected WeightVector weight_vector;
 	private OptimizerType type;
-	
+	protected Set<Integer> removedFeatures;
+	protected float l1delta;
+
 	public Optimizer(WeightVector weightVector, OptimizerType type)
 	{
 		weight_vector = weightVector;
 		this.type = type;
+		removedFeatures = new HashSet<>();
+		l1delta = 0.001f;
 	}
 	
 	public OptimizerType getType()
@@ -54,5 +60,9 @@ public abstract class Optimizer
 		double[] scores = weight_vector.scores(instance.getVector());
 		scores[instance.getLabel()] -= 1;
 		return DSUtils.maxIndex(scores);
+	}
+
+	public Set<Integer> getRemovedFeatures() {
+		return removedFeatures;
 	}
 }

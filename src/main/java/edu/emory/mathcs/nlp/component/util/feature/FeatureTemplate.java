@@ -21,6 +21,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.StringJoiner;
 
 import edu.emory.mathcs.nlp.learn.vector.StringVector;
@@ -88,28 +89,53 @@ public abstract class FeatureTemplate<N,S> implements Serializable
 	
 //	============================== EXTRACTOR ==============================
 	
-	public StringVector extractFeatures()
+	public StringVector extractFeatures(Set<Integer> removedFeatures)
 	{
 		StringVector x = new StringVector();
 		int i, type = 0;
 		String[] t;
 		String f;
 		
+		for (i=0; i<feature_list.size(); i++,type++) {
+			if (removedFeatures.contains(type)) {
+				continue;
+			}
+			f = getFeature(feature_list.get(i));
+			if (f != null)
+				x.add(type, f);
+		}
+		
+		for (i=0; i<feature_set.size(); i++,type++)
+		{
+			if (removedFeatures.contains(type)) {
+				continue;
+			}
+			t = getFeatures(feature_set.get(i));
+			if (t != null) for (String s : t) x.add(type, s);
+		}
+		return x;
+	}
+	public StringVector extractFeatures()
+	{
+		StringVector x = new StringVector();
+		int i, type = 0;
+		String[] t;
+		String f;
+
 		for (i=0; i<feature_list.size(); i++,type++)
 		{
 			f = getFeature(feature_list.get(i));
 			if (f != null) x.add(type, f);
 		}
-		
+
 		for (i=0; i<feature_set.size(); i++,type++)
 		{
 			t = getFeatures(feature_set.get(i));
 			if (t != null) for (String s : t) x.add(type, s);
 		}
-		
+
 		return x;
 	}
-	
 	private String getFeature(FeatureItem<?>... items)
 	{
 		String f;

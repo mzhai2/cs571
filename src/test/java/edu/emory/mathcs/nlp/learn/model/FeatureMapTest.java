@@ -38,14 +38,14 @@ public class FeatureMapTest
 		map.add(1, "C");
 		map.add(1, "C");
 		
-		map.expand(1);
+//		map.expand(1);
 		System.out.println(map.toString());
 		
 		map.add(0, "B");
 		map.add(0, "B");
 		map.add(2, "B");
 		
-		map.expand(1);
+//		map.expand(1);
 		System.out.println(map.toString());
 	}
 }

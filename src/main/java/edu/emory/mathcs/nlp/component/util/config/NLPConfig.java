@@ -19,6 +19,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 import java.io.InputStream;
+import java.util.Set;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -119,7 +120,8 @@ public abstract class NLPConfig<N> implements ConfigXML
 	{
 		Element eOptimizer = XMLUtils.getElementByTagName(xml, OPTIMIZER, index);
 		String  algorithm  = XMLUtils.getTextContentFromFirstElementByTagName(eOptimizer, ALGORITHM);
-		initOptimizer(eOptimizer, model);
+		Set<Integer> removedFeatures = null;
+		initOptimizer(eOptimizer, model, removedFeatures);
 		
 		switch (algorithm)
 		{
@@ -133,7 +135,7 @@ public abstract class NLPConfig<N> implements ConfigXML
 		throw new IllegalArgumentException(algorithm+" is not a valid algorithm name.");
 	}
 	
-	private void initOptimizer(Element eOptimizer, StringModel model)
+	private void initOptimizer(Element eOptimizer, StringModel model, Set<Integer> removedFeatures)
 	{
 		int labelCutoff   = XMLUtils.getIntegerTextContentFromFirstElementByTagName(eOptimizer, LABEL_CUTOFF);
 		int featureCutoff = XMLUtils.getIntegerTextContentFromFirstElementByTagName(eOptimizer, FEATURE_CUTOFF);
@@ -141,7 +143,7 @@ public abstract class NLPConfig<N> implements ConfigXML
 		boolean reset     = XMLUtils.getBooleanTextContentFromFirstElementByTagName(eOptimizer, RESET_WEIGHTS);
 		
 		model.setBias(bias);
-		model.vectorize(labelCutoff, featureCutoff, reset);
+		model.vectorize(labelCutoff, featureCutoff, reset, removedFeatures);
 	}
 	
 	private Perceptron getPerceptron(Element eOptimizer, StringModel model)
