@@ -82,8 +82,8 @@ public class FeatureMap implements Serializable
 		for (Entry<Integer,Object2IntMap<String>> e : count_map.entrySet())
 		{
 			type = e.getKey();
-//			if (removedFeatures.contains(type))
-//				continue;
+			if (removedFeatures.contains(type))
+				continue;
 			countMap = e.getValue();
 			
 			expandTypes(type);

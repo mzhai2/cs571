@@ -212,7 +212,7 @@ public abstract class NLPComponent<N,S extends NLPState<N>> implements Serializa
 			return new StringPrediction(state.getOraclePrediction(), 1);
 		else
 			return getModelPrediction(state, vector);
-
+//		return isTrain() ? new StringPrediction(state.getOraclePrediction(), 1) : getModelPrediction(state, vector);
 	}
 
 	protected StringVector extractFeatures(Set<Integer> removedFeatures)

@@ -212,7 +212,7 @@ public class StringModel implements Serializable
 		
 		build.append("- # of instances: "+instance_list.size()+"\n");
 		build.append("- # of labels   : "+label_map.size()+"\n");
-		build.append("- # of features : "+feature_map.size()+"\n");
+		build.append("- # of features : "+(feature_map.size()-removedFeatures.size())+"\n");
 		build.append("- # of features removed : "+removedFeatures.size());
 
 		return build.toString();

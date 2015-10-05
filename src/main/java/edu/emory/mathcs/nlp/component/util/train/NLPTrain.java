@@ -17,6 +17,8 @@ package edu.emory.mathcs.nlp.component.util.train;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -124,11 +126,38 @@ public abstract class NLPTrain<N,S extends NLPState<N>>
 			}
 
 			float[] w = component.getModels()[0].getWeightVector().toArray();
-			for (int f=0; f<w.length; f++) {
-				if (w[f] == 0) {
-					removedFeatures.add(f);
+			int labelSize = component.getModels()[0].getWeightVector().labelSize();
+//			for (int f=0; f<w.length; f++) {
+//				if (w[f] == 0) {
+//					removedFeatures.add(f);
+//				}
+//			}
+			double threshold = 0.000001;
+			for (int k=0; k<w.length; k+=labelSize) {
+				float sum = 0;
+				for (int j = 0; j < labelSize; j++)
+					sum += w[k + j];
+				if (sum < threshold) {
+					removedFeatures.add(k / labelSize);
+					for (int j = 0; j < labelSize; j++)
+						w[k + j] = 0;
 				}
 			}
+			
+//			float[] newWeights = new float[w.length-removedFeatures.size()*labelSize];
+//			int nWcounter = 0;
+//			for (int k=0; k<w.length; k+=labelSize) {
+//				if (!removedFeatures.contains(k)) {
+//					for (int j = 0; j < labelSize; j++) {
+//						System.out.println(newWeights[nWcounter + j]);
+//						System.out.println(w[k + j]);
+//						newWeights[nWcounter + j] = w[k + j];
+//					}
+//					nWcounter += labelSize;
+//				}
+//			}
+//			component.getModels()[0].getWeightVector().fromArray(newWeights);
+//			removedFeatures.clear();
 		}
 		
 		BinUtils.LOG.info(String.format("\nFinal score: %5.2f\n", bestScore));
@@ -160,8 +189,8 @@ public abstract class NLPTrain<N,S extends NLPState<N>>
 	protected double trainOnline(TSVReader<N> reader, List<String> developFiles, NLPComponent<N,?> component, Optimizer optimizer, StringModel model, int iter)
 	{
 		Eval eval = component.getEval();
-		double prevScore = 0, currScore;
-		float[] prevWeight = null;
+		double prevScore = 0, currScore, bestScore;
+		float[] bestWeight = null;
 		
 		for (int epoch=1; ;epoch++)
 		{
@@ -169,15 +198,18 @@ public abstract class NLPTrain<N,S extends NLPState<N>>
 			optimizer.train(model.getInstanceList());
 			iterate(reader, developFiles, nodes -> component.process(nodes, iter, model.getRemovedFeatures()));
 			currScore = eval.score();
+			bestScore = currScore;
 
-			if (prevScore < currScore)
-			{
-				prevScore  = currScore;
-				prevWeight = model.getWeightVector().toArray().clone();
+			if (currScore > bestScore) {
+				bestWeight = model.getWeightVector().toArray().clone();
+				epoch--;
+			}
+			else if (prevScore < currScore || epoch > 2) {
+
 			}
 			else
 			{
-				model.getWeightVector().fromArray(prevWeight);
+				model.getWeightVector().fromArray(bestWeight);
 				break;
 			}
 			
