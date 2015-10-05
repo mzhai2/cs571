@@ -40,6 +40,7 @@ public class StringModel implements Serializable
 	private FeatureMap            feature_map;
 	private WeightVector          weight_vector;
 	private float                 bias;
+	private Set<Integer>		removedFeatures;
 	private int labelCutoff;
 	private int featureCutoff;
 	private boolean reset;
@@ -50,8 +51,14 @@ public class StringModel implements Serializable
 		label_map      = new LabelMap();
 		feature_map    = new FeatureMap();
 		weight_vector  = vector;
+		removedFeatures = new HashSet<>();
+
 	}
-	
+
+	public Set<Integer> getRemovedFeatures() {
+		return removedFeatures;
+	}
+
 	public float getBias()
 	{
 		return bias;
@@ -96,6 +103,7 @@ public class StringModel implements Serializable
 	{
 		return instance_list;
 	}
+
 	public void vectorize(int labelCutoff, int featureCutoff, boolean reset)
 	{
 		this.reset = reset;
@@ -133,6 +141,9 @@ public class StringModel implements Serializable
 
 	public void vectorize(int labelCutoff, int featureCutoff, boolean reset, Set<Integer> removedFeatures)
 	{
+		if (removedFeatures == null)
+			removedFeatures = this.removedFeatures;
+
 		this.reset = reset;
 		this.labelCutoff = labelCutoff;
 		this.featureCutoff = featureCutoff;
@@ -201,8 +212,9 @@ public class StringModel implements Serializable
 		
 		build.append("- # of instances: "+instance_list.size()+"\n");
 		build.append("- # of labels   : "+label_map.size()+"\n");
-		build.append("- # of features : "+feature_map.size());
-		
+		build.append("- # of features : "+feature_map.size()+"\n");
+		build.append("- # of features removed : "+removedFeatures.size());
+
 		return build.toString();
 	}
 }

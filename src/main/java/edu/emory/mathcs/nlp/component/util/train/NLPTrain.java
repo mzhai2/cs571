@@ -18,6 +18,7 @@ package edu.emory.mathcs.nlp.component.util.train;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import edu.emory.mathcs.nlp.learn.weight.WeightVector;
@@ -103,14 +104,16 @@ public abstract class NLPTrain<N,S extends NLPState<N>>
 			BinUtils.LOG.info(String.format("\nTraining: %d\n\n", iter));
 			component.setFlag(iter == 0 ? NLPFlag.TRAIN : NLPFlag.AGGREGATE);
 			prevScore = currScore;
+			iterate(reader, trainFiles, nodes -> component.process(nodes));
 			Optimizer[] optimizers = configuration.getOptimizers(models);
 			currScore = trainIter(reader, trainFiles, developFiles, component, configuration, iter, optimizers);
-
+			Set<Integer> removedFeatures = models[0].getRemovedFeatures();
 			if (dagger == null) break;	// no aggregating
 			
-			if (prevScore < currScore || prevScore > currScore + dagger.getToleranceDelta() || iter - dagger.getMaxTolerance() > bestIter)
+			if (prevScore > currScore + dagger.getToleranceDelta() || iter - dagger.getMaxTolerance() > bestIter)
 			{
 				for (i=0; i<size; i++) models[i].getWeightVector().fromArray(bestWeight[i]);
+				prevScore = currScore;
 				break;
 			}
 			else if (bestScore < currScore)
@@ -123,7 +126,7 @@ public abstract class NLPTrain<N,S extends NLPState<N>>
 			float[] w = component.getModels()[0].getWeightVector().toArray();
 			for (int f=0; f<w.length; f++) {
 				if (w[f] == 0) {
-					optimizers[0].getRemovedFeatures().add(f);
+					removedFeatures.add(f);
 				}
 			}
 		}
@@ -138,12 +141,9 @@ public abstract class NLPTrain<N,S extends NLPState<N>>
 
 		for (int i=0; i<optimizers.length; i++)
 		{
-			Optimizer o = optimizers[i];
-
-			if (o.getRemovedFeatures().size() == 0)
-				iterate(reader, trainFiles, nodes -> component.process(nodes));
-			else
-				iterate(reader, trainFiles, nodes -> component.process(nodes, iter, o.getRemovedFeatures()));
+			Set<Integer> removedFeatures = models[0].getRemovedFeatures();
+			if (removedFeatures.size() > 0)
+				iterate(reader, trainFiles, nodes -> component.process(nodes, iter, removedFeatures));
 
 			BinUtils.LOG.info(optimizers[i].toString()+", bias = "+models[i].getBias()+"\n");
 			BinUtils.LOG.info(models[i].trainInfo()+"\n");
@@ -167,7 +167,7 @@ public abstract class NLPTrain<N,S extends NLPState<N>>
 		{
 			eval.clear();
 			optimizer.train(model.getInstanceList());
-			iterate(reader, developFiles, nodes -> component.process(nodes, iter, optimizer.getRemovedFeatures()));
+			iterate(reader, developFiles, nodes -> component.process(nodes, iter, model.getRemovedFeatures()));
 			currScore = eval.score();
 
 			if (prevScore < currScore)
@@ -183,7 +183,7 @@ public abstract class NLPTrain<N,S extends NLPState<N>>
 			
 			BinUtils.LOG.info(String.format("%3d: %5.2f\n", epoch, currScore));
 		}
-		
+
 		return prevScore; 
 	}
 
@@ -193,7 +193,7 @@ public abstract class NLPTrain<N,S extends NLPState<N>>
 
 		eval.clear();
 		optimizer.train(model.getInstanceList());
-		iterate(reader, developFiles, nodes -> component.process(nodes, iter, optimizer.getRemovedFeatures()));
+		iterate(reader, developFiles, nodes -> component.process(nodes, iter, model.getRemovedFeatures()));
 		BinUtils.LOG.info(String.format("- %s\n", eval.toString()));
 		return eval.score();
 	}

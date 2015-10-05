@@ -22,6 +22,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -38,7 +39,7 @@ public class FeatureMap implements Serializable
 	private Int2ObjectMap<Object2IntMap<String>> count_map;
 	private List<Object2IntMap<String>> index_map;
 	private int feature_size;
-	
+
 	public FeatureMap()
 	{
 		count_map = new Int2ObjectOpenHashMap<>();
@@ -81,8 +82,8 @@ public class FeatureMap implements Serializable
 		for (Entry<Integer,Object2IntMap<String>> e : count_map.entrySet())
 		{
 			type = e.getKey();
-			if (removedFeatures.contains(type))
-				continue;
+//			if (removedFeatures.contains(type))
+//				continue;
 			countMap = e.getValue();
 			
 			expandTypes(type);
@@ -140,4 +141,5 @@ public class FeatureMap implements Serializable
 	{
 		return index_map.toString();
 	}
+
 }
