@@ -36,7 +36,7 @@ public abstract class Optimizer
 	{
 		weight_vector = weightVector;
 		this.type = type;
-		l1delta = 0.000001f;
+		l1delta = 0.00000001f;
 	}
 	
 	public OptimizerType getType()
