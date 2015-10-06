@@ -19,6 +19,8 @@ import edu.emory.mathcs.nlp.component.util.eval.AccuracyEval;
 import edu.emory.mathcs.nlp.component.util.eval.Eval;
 import edu.emory.mathcs.nlp.component.util.state.L2RState;
 
+import java.util.Set;
+
 /**
  * @author Jinho D. Choi ({@code jinho.choi@emory.edu})
  */
@@ -42,6 +44,11 @@ public class POSState<N extends POSNode> extends L2RState<N>
 	protected String setLabel(N node, String label)
 	{
 		return node.setPOSTag(label);
+	}
+
+	@Override
+	public Set<String> getDynamicOraclePrediction() {
+		return null;
 	}
 
 	@Override

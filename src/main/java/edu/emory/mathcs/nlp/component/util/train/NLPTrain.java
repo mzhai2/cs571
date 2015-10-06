@@ -99,52 +99,10 @@ public abstract class NLPTrain<N,S extends NLPState<N>>
 		iterate(reader, trainFiles, component::process);
 
 			component.setFlag(NLPFlag.EVALUATE);
-		bestScore = trainSearch(reader, developFiles, component, configuration);
+		bestScore = train(reader, developFiles, component, configuration);
 		BinUtils.LOG.info(String.format("\nFinal score: %5.2f\n", bestScore));
 	}
 
-	public double trainSearch(TSVReader<N> reader, List<String> developFiles, NLPComponent<N,?> component, NLPConfig<N> configuration)
-	{
-		StringModel[] models = component.getModels();
-		Optimizer[] optimizers = configuration.getOptimizers(models);
-		double score = 0;
-		Optimizer optimizer = optimizers[0];
-		StringModel model = models[0];
-
-		BinUtils.LOG.info(optimizers[0].toString()+", bias = "+models[0].getBias()+"\n");
-		BinUtils.LOG.info(models[0].trainInfo()+"\n");
-
-		Eval eval = component.getEval();
-		double prevScore = 0, currScore;
-		float[] prevWeight = null;
-
-		for (int epoch=1; ;epoch++)
-		{
-			eval.clear();
-			optimizer.train(model.getInstanceList());
-			iterate(reader, developFiles, component::process);
-			predict(model.getInstanceList(),)
-
-			currScore = eval.score();
-
-			if (prevScore < currScore)
-			{
-				prevScore  = currScore;
-				prevWeight = model.getWeightVector().toArray().clone();
-			}
-			else
-			{
-				model.getWeightVector().fromArray(prevWeight);
-				break;
-			}
-
-			BinUtils.LOG.info(String.format("%3d: %5.2f\n", epoch, currScore));
-		}
-
-		return prevScore;
-
-		return score;
-	}
 	public void train(TSVReader<N> reader, List<String> trainFiles, List<String> developFiles, NLPConfig<N> configuration, NLPComponent<N,S> component)
 	{
 		BinUtils.LOG.info("Collecting lexicons:\n");

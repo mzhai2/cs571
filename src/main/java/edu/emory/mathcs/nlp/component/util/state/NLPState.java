@@ -56,6 +56,4 @@ public abstract class NLPState<N>
 		index += window;
 		return DSUtils.isRange(nodes, index) ? nodes[index] : null;
 	}
-
-	public abstract StringPrediction[] validLabels();
 }

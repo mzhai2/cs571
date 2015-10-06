@@ -168,8 +168,7 @@ public abstract class NLPComponent<N,S extends NLPState<N>> implements Serializa
 	
 		if (isEvaluate()) state.evaluate(eval);
 	}
-
-	public void processDynamic(N[] nodes)
+	public void processD(N[] nodes)
 	{
 		S state = createState(nodes);
 		feature_template.setState(state);
@@ -179,33 +178,17 @@ public abstract class NLPComponent<N,S extends NLPState<N>> implements Serializa
 		{
 			StringVector vector = extractFeatures();
 			if (isTrainOrAggregate()) addInstance(state.getDynamicOraclePrediction(), vector);
-
-			List<StringPrediction> gold = getDynamicPrediction(state, vector); // how does it give back only one?
-//			StringPrediction gold = getPrediction(state, vector);
-			StringPrediction label = Search.predict(vector, gold, state.validLabels());
+			StringPrediction label = getPrediction(state, vector);
 			state.next(label);
 		}
 
 		if (isEvaluate()) state.evaluate(eval);
 	}
-	
+
 	/** @return the oracle prediction for training; otherwise, the model predict. */
 	protected StringPrediction getPrediction(S state, StringVector vector)
 	{
 		return isTrain() ? new StringPrediction(state.getOraclePrediction(), 1) : getModelPrediction(state, vector);
-	}
-
-	protected List<StringPrediction> getDynamicPrediction(S state, StringVector vector)
-	{
-		List<StringPrediction> predictions = new ArrayList<>();
-		if (isTrain()) {
-			for (String s : state.getDynamicOraclePrediction()) {
-				predictions.add(new StringPrediction(s, 1));
-			}
-		}
-		else {
-			 predictions = getDynamicModelPrediction(state, vector);
-		}
 	}
 
 	/** @return the vector consisting of all features extracted from the state. */

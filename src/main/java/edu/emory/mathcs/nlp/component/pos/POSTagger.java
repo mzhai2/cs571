@@ -18,6 +18,7 @@ package edu.emory.mathcs.nlp.component.pos;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Set;
 
 import edu.emory.mathcs.nlp.component.util.NLPComponent;
 import edu.emory.mathcs.nlp.learn.model.StringModel;
@@ -80,5 +81,10 @@ public class POSTagger<N extends POSNode> extends NLPComponent<N,POSState<N>>
 	protected void addInstance(String label, StringVector vector)
 	{
 		models[0].addInstance(new StringInstance(label, vector));
+	}
+
+	@Override
+	protected void addInstance(Set<String> label, StringVector vector) {
+
 	}
 }

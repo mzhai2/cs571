@@ -100,23 +100,23 @@ public class DEPState<N extends DEPNode> extends NLPState<N>
 
 		DEPArc o = oracle[stack.topInt()];
 
-		if (o.isNode(getInput(0)) || !depInBuffer(o))
+		if (o.isNode(getInput(0)) || (!headInBuffer(o) && isOracleReduce()) || (!(o.isNode(getInput(0))) && !headInBuffer(o)) && (input != nodes.length && input != stack.size()))
 			valids.add(LEFT_ARC);
 
 		o = oracle[input];
 
-		if (o.isNode(getStack(0)) || (!depInBuffer(o) && (!depInstack(o))))
+		if (o.isNode(getStack(0)) || (!headInBuffer(o) && !headInStack(o) && !depInStack(o)) || (!o.isNode(getStack(0)) && !headInStack(o) && !headInBuffer(o) && !depInStack(o)) && (input != nodes.length && input != stack.size()))
 			valids.add(RIGHT_ARC);
 
-		if (isOracleReduce())
+		if (isOracleReduce() && (input != nodes.length && input != stack.size()))	//no dep in B
 			valids.add(REDUCE);
 
-		if (depInstack(o) || headInStack(o) )
+		if (!headInStack(o) && !depInStack(o) && (nodes.length - input) > 1)
 			valids.add(SHIFT);
 		return valids;
 	}
 
-	private boolean depInBuffer(DEPArc o) {
+	private boolean headInBuffer(DEPArc o) {
 		for (int i = input; i<nodes.length;i++) {
 			N n = nodes[i];
 			if (o.isNode(n))
@@ -124,26 +124,20 @@ public class DEPState<N extends DEPNode> extends NLPState<N>
 		}
 		return false;
 	}
-	private boolean depInstack(DEPArc o) {
+	private boolean headInStack(DEPArc o) {
 		for (int i=0; i <stack.size(); i++)
 			if (o.isNode(getStack(i)))
 				return true;
 		return false;
 	}
 
-	private boolean headInStack(DEPArc o) {
+	private boolean depInStack(DEPArc o) {
 		for (int i=0; i <stack.size(); i++)
 			if (oracle[stack.getInt(i)].isNode(o.getNode()))
 				return true;
 		return false;
 	}
 
-//	==================================== SEARCHING =========================================
-
-	@Override
-	public StringPrediction[] validLabels() {
-
-	}
 
 //	====================================== TRANSITION ======================================
 	
