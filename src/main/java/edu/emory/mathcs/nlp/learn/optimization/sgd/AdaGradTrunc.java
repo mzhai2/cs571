@@ -21,6 +21,7 @@ import edu.emory.mathcs.nlp.learn.vector.IndexValuePair;
 import edu.emory.mathcs.nlp.learn.vector.Vector;
 import edu.emory.mathcs.nlp.learn.weight.WeightVector;
 
+import java.util.Random;
 import java.util.StringJoiner;
 
 /**
@@ -70,17 +71,12 @@ public class AdaGradTrunc extends SGDClassification
 		{
 			updateDiagonals(yp, x);
 			updateDiagonals(yn, x);
-
 			for (IndexValuePair p : x) {
 				possiblePenalty.toArray()[weight_vector.labelSize()*p.getIndex() + yn] += l1 *getGradient(yp, p.getIndex());
 				possiblePenalty.toArray()[weight_vector.labelSize()*p.getIndex() + yp] += l1 *getGradient(yp, p.getIndex());
 			}
-			update(yp, yn, x);
 		}
-
-
-		if (Math.random() < 0.3)
-			updateWeight(instance);
+		updateWeight(instance);
 
 	}
 

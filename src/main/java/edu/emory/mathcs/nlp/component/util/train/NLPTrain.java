@@ -147,27 +147,20 @@ public abstract class NLPTrain<N,S extends NLPState<N>>
 	protected double trainOnline(TSVReader<N> reader, List<String> developFiles, NLPComponent<N,?> component, Optimizer optimizer, StringModel model, int iter)
 	{
 		Eval eval = component.getEval();
-		double prevScore = 0, currScore;
-		float[] prevWeight = null;
-		
-		for (int epoch=1; ;epoch++)
+		double bestScore = 0, prevScore = 0, currScore;
+		float[] bestWeight = null;
+
+		for (int epoch=1; epoch<5;epoch++)
 		{
 			eval.clear();
 			optimizer.train(model.getInstanceList());
 			iterate(reader, developFiles, nodes -> component.process(nodes, iter));
 			currScore = eval.score();
-			
-			if (prevScore < currScore)
+			if (bestScore < currScore)
 			{
-				prevScore  = currScore;
-				prevWeight = model.getWeightVector().toArray().clone();
-			}
-			else
-			{
-				if (epoch < 10)
-					continue;
-				model.getWeightVector().fromArray(prevWeight);
-				break;
+				bestScore = currScore;
+				bestWeight = model.getWeightVector().toArray().clone();
+				epoch -= 3;
 			}
 
 			int nonEmpty = 0;
@@ -176,7 +169,8 @@ public abstract class NLPTrain<N,S extends NLPState<N>>
 					nonEmpty++;
 			BinUtils.LOG.info(String.format("%3d: %5.2f nonEmpty: %d\n", epoch, currScore, nonEmpty));
 		}
-		
+
+		model.getWeightVector().fromArray(bestWeight);
 		return prevScore; 
 	}
 

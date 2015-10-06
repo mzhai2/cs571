@@ -97,7 +97,7 @@ public class POSBenchmark
 		switch (type)
 		{
 		case 0: sgd = new Perceptron(weight, average, learning_rate); break;
-		case 1: sgd = new AdaGrad   (weight, average, learning_rate); break;
+		case 1: sgd = new AdaGrad(weight, average, learning_rate); break;
 		}
 		
 		Eval eval = new AccuracyEval();

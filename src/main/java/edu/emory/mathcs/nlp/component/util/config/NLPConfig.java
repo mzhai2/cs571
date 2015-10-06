@@ -126,7 +126,6 @@ public abstract class NLPConfig<N> implements ConfigXML
 		{
 			case PERCEPTRON         : return getPerceptron       (eOptimizer, model);
 			case ADAGRADTRUNC       : return getAdaGradTrunc(eOptimizer, model);
-
 			case ADAGRAD            : return getAdaGrad          (eOptimizer, model);
 			case ADAGRAD_MINI_BATCH : return getAdaGradMiniBatch (eOptimizer, model);
 			case ADADELTA_MINI_BATCH: return getAdaDeltaMiniBatch(eOptimizer, model);
