@@ -16,6 +16,7 @@
 package edu.emory.mathcs.nlp.learn.util;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import edu.emory.mathcs.nlp.learn.vector.StringVector;
 
@@ -27,12 +28,17 @@ public class StringInstance implements Serializable
 	private static final long serialVersionUID = 1704398147440599696L;
 	private StringVector vector;
 	private String label;
+	private Set<String> labels;
 	
 	public StringInstance(String label, StringVector vector)
 	{
 		set(label, vector);
 	}
-	
+	public StringInstance(Set<String> labels, StringVector vector)
+	{
+		set(labels, vector);
+	}
+
 	public String getLabel()
 	{
 		return label;
@@ -54,6 +60,12 @@ public class StringInstance implements Serializable
 	}
 	
 	public void set(String label, StringVector vector)
+	{
+		setLabel(label);
+		setVector(vector);
+	}
+
+	public void set(Set<String> labels, StringVector vector)
 	{
 		setLabel(label);
 		setVector(vector);
