@@ -31,6 +31,11 @@ public class AdaGradRegression extends StochasticGradientDescent
 	}
 
 	@Override
+	protected int updateMultinomialOnline(Instance instance) {
+		return 0;
+	}
+
+	@Override
 	protected void updateBinomial(Instance instance)
 	{
 		// TODO Auto-generated method stub

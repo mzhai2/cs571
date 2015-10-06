@@ -16,11 +16,7 @@
 package edu.emory.mathcs.nlp.learn.model;
 
 import java.io.Serializable;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 import edu.emory.mathcs.nlp.learn.util.Instance;
 import edu.emory.mathcs.nlp.learn.util.Prediction;
@@ -44,13 +40,15 @@ public class StringModel implements Serializable
 	private FeatureMap            feature_map;
 	private WeightVector          weight_vector;
 	private float                 bias;
-	
+	private Map<Integer, String>  unLabel_map;
+
 	public StringModel(WeightVector vector)
 	{
 		instance_deque = new ArrayDeque<>();
 		label_map      = new LabelMap();
 		feature_map    = new FeatureMap();
 		weight_vector  = vector;
+		unLabel_map	   = new HashMap<>();
 	}
 	
 	public float getBias()
@@ -91,33 +89,47 @@ public class StringModel implements Serializable
 		instance_list = new ArrayList<>();
 		StringInstance instance;
 		int labelIndex;
-		
+
 		// filtering
 		if (reset)
 		{
 			label_map  .initIndices();
 			feature_map.initIndices();
 		}
-		
+
 		label_map  .expand(labelCutoff);
 		feature_map.expand(featureCutoff);
-		
+
 		if (reset)	weight_vector.init  (label_map.size(), feature_map.size());
 		else		weight_vector.expand(label_map.size(), feature_map.size());
-		
+
 		// vectorizing
-		while (!instance_deque.isEmpty())
-		{
-			instance   = instance_deque.poll();
-			labelIndex = label_map.indexOf(instance.getLabel());
-			
-			if (labelIndex >= 0)
-				instance_list.add(new Instance(labelIndex, toSparseVector(instance.getVector())));
+//		while (!instance_deque.isEmpty())
+//		{
+//			instance   = instance_deque.poll();
+//			labelIndex = label_map.indexOf(instance.getLabel());
+//
+//			if (labelIndex >= 0)
+//				instance_list.add(new Instance(labelIndex, toSparseVector(instance.getVector())));
+//		}
+			for (Map.Entry<String, Integer> entry : label_map.getIndex_map().entrySet()){
+				unLabel_map.put(entry.getValue(), entry.getKey());
+			System.out.println(entry.getKey() + " " + entry.getValue());
 		}
-		
+
 		instance_deque = new ArrayDeque<>();
 	}
-	
+
+	public Instance vectorize(Set<String> labels, StringVector vector)
+	{
+		return new Instance(label_map.indicesOf(labels), toSparseVector(vector));
+	}
+
+	public String unVectorize(int labelIndex) {
+		return unLabel_map.get(labelIndex);
+	}
+
+
 	public SparseVector toSparseVector(StringVector vector)
 	{
 		SparseVector x = new SparseVector();

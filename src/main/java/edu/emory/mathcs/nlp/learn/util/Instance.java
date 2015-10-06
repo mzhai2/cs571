@@ -16,6 +16,7 @@
 package edu.emory.mathcs.nlp.learn.util;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import edu.emory.mathcs.nlp.learn.vector.Vector;
 
@@ -26,18 +27,28 @@ public class Instance implements Serializable
 {
 	private static final long serialVersionUID = 8175869181443119424L;
 	protected int    label;
+	protected Set<Integer>    labels;
+
+
 	protected Vector vector;
 	
 	public Instance(int label, Vector vector)
 	{
 		set(label, vector);
 	}
-	
+	public Instance(Set<Integer> labels, Vector vector)
+	{
+		set(labels, vector);
+	}
 	public int getLabel()
 	{
 		return label;
 	}
-	
+	public Set<Integer> getLabels()
+	{
+		return labels;
+	}
+
 	public Vector getVector()
 	{
 		return vector;
@@ -46,6 +57,10 @@ public class Instance implements Serializable
 	public void setLabel(int label)
 	{
 		this.label = label;
+	}
+	public void setLabels(Set<Integer> labels)
+	{
+		this.labels = labels;
 	}
 
 	public void setVector(Vector vector)
@@ -58,7 +73,11 @@ public class Instance implements Serializable
 		setLabel(label);
 		setVector(vector);
 	}
-	
+	public void set(Set<Integer> labels, Vector vector)
+	{
+		setLabels(labels);
+		setVector(vector);
+	}
 	public boolean isLabel(int label)
 	{
 		return this.label == label;

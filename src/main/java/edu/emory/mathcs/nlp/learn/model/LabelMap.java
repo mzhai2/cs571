@@ -20,8 +20,10 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import edu.emory.mathcs.nlp.common.util.FastUtils;
 
@@ -81,7 +83,19 @@ public class LabelMap implements Serializable
 	{
 		return index_map.getOrDefault(label, -1);
 	}
-	
+
+	public Set<Integer> indicesOf(Set<String> labels)
+	{
+		Set<Integer> intSet = new HashSet<>();
+		for (String label : labels)
+			intSet.add(index_map.getOrDefault(label, -1));
+		return intSet;
+	}
+
+	public Object2IntMap<String> getIndex_map() {
+		return index_map;
+	}
+
 	public String getLabel(int index)
 	{
 		return list.get(index);
@@ -102,4 +116,6 @@ public class LabelMap implements Serializable
 	{
 		return list.toString();
 	}
+
+
 }

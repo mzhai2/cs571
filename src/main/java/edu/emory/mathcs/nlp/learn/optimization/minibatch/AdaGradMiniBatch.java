@@ -18,6 +18,7 @@ package edu.emory.mathcs.nlp.learn.optimization.minibatch;
 import java.util.StringJoiner;
 
 import edu.emory.mathcs.nlp.common.util.MathUtils;
+import edu.emory.mathcs.nlp.learn.util.Instance;
 import edu.emory.mathcs.nlp.learn.weight.WeightVector;
 
 /**
@@ -45,5 +46,10 @@ public class AdaGradMiniBatch extends AdaptiveMiniBatch
 		join.add("learning rate = "+learning_rate);
 		
 		return "AdaGrad: "+join.toString();
+	}
+
+	@Override
+	protected int updateMultinomialOnline(Instance instance) {
+		return 0;
 	}
 }

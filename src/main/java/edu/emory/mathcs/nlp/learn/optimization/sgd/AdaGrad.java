@@ -15,6 +15,7 @@
  */
 package edu.emory.mathcs.nlp.learn.optimization.sgd;
 
+import java.util.Set;
 import java.util.StringJoiner;
 
 import edu.emory.mathcs.nlp.common.util.MathUtils;
@@ -88,5 +89,23 @@ public class AdaGrad extends SGDClassification
 		join.add("learning rate = "+learning_rate);
 		
 		return "AdaGrad: "+join.toString();
+	}
+
+	@Override
+	protected int updateMultinomialOnline(Instance instance)
+	{
+		Vector x = instance.getVector();
+		Set<Integer>   yps = instance.getLabels();
+		int   yn = multinomialBestHingeLoss(instance);
+
+		if (!yps.contains(yn))
+		{
+			update(yps, yn, x);
+			updateDiagonals(yn, x);
+			for (int yp : yps) {
+				updateDiagonals(yp, x);
+			}
+		}
+		return yn;
 	}
 }

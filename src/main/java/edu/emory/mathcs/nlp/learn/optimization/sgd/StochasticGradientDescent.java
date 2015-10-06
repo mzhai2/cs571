@@ -49,7 +49,13 @@ public abstract class StochasticGradientDescent extends OnlineOptimizer
 		
 		if (isAveraged() && steps > 0) average();
 	}
-	
+
+	@Override
+	public int trainOnline(Instance instance) {
+		return updateOnline(instance);
+	}
+
+
 	private void average()
 	{
 		float[] w = weight_vector .toArray();

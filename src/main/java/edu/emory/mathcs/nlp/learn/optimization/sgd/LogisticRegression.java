@@ -31,7 +31,12 @@ public class LogisticRegression extends StochasticGradientDescent
 	{
 		super(weightVector, average, learningRate);
 	}
-	
+
+	@Override
+	protected int updateMultinomialOnline(Instance instance) {
+		return 0;
+	}
+
 	@Override
 	protected void updateBinomial(Instance instance)
 	{

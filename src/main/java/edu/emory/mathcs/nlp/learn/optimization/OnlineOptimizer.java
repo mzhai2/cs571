@@ -51,6 +51,11 @@ public abstract class OnlineOptimizer extends Optimizer
 	{
 		train(instances, 1);
 	}
+
+	public int trainOnline(Instance instance)
+	{
+		return trainOnline(instance);
+	}
 	
 	/** Shuffles the trainign instances. */
 	public void shuffle(List<Instance> instances)
@@ -81,11 +86,19 @@ public abstract class OnlineOptimizer extends Optimizer
 		else
 			updateMultinomial(instance);
 	}
-	
+
+	protected int updateOnline(Instance instance)
+	{
+		return updateMultinomialOnline(instance);
+	}
+
+
+
 	/**
 	 * Updates the weight vector for binomial classification.
 	 * Called by {@link #update(Instance)}.
 	 */
+	protected abstract int updateMultinomialOnline(Instance instance);
 	protected abstract void updateBinomial(Instance instance);
 	/**
 	 * Updates the weight vector for multinomial classification.

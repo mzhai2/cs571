@@ -19,12 +19,16 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Random;
 import java.util.Set;
 
 import edu.emory.mathcs.nlp.component.util.eval.Eval;
 import edu.emory.mathcs.nlp.component.util.feature.FeatureTemplate;
 import edu.emory.mathcs.nlp.component.util.state.NLPState;
 import edu.emory.mathcs.nlp.learn.model.StringModel;
+import edu.emory.mathcs.nlp.learn.optimization.OnlineOptimizer;
+import edu.emory.mathcs.nlp.learn.optimization.Optimizer;
+import edu.emory.mathcs.nlp.learn.util.Instance;
 import edu.emory.mathcs.nlp.learn.util.StringPrediction;
 import edu.emory.mathcs.nlp.learn.vector.StringVector;
 
@@ -158,6 +162,7 @@ public abstract class NLPComponent<N,S extends NLPState<N>> implements Serializa
 		while (!state.isTerminate())
 		{
 			StringVector vector = extractFeatures();
+
 			if (isTrainOrAggregate()) addInstance(state.getOraclePrediction(), vector);
 			StringPrediction label = getPrediction(state, vector);
 			state.next(label);
@@ -165,21 +170,44 @@ public abstract class NLPComponent<N,S extends NLPState<N>> implements Serializa
 	
 		if (isEvaluate()) state.evaluate(eval);
 	}
-	public void processD(N[] nodes)
+	public void processD(N[] nodes, OnlineOptimizer o, StringModel model, int iter)
 	{
 		S state = createState(nodes);
 		feature_template.setState(state);
-		if (!isDecode()) state.saveOracle(); // why? doesnt this clear the gold?
+		if (!isDecode()) state.saveOracle();
 
 		while (!state.isTerminate())
 		{
 			StringVector vector = extractFeatures();
-			if (isTrainOrAggregate()) addInstance(state.getDynamicOraclePrediction(), vector);
-			StringPrediction label = getPrediction(state, vector);
-			state.next(label);
+
+			if (isTrainOrAggregate()) {
+				Set<String> zeroCosts = state.getDynamicOraclePrediction();
+				System.out.println("zero cost oracle transitions: " +zeroCosts.toString());
+				Instance instance = model.vectorize(zeroCosts, vector);
+				int predicted = o.trainOnline(instance);
+				String label = model.unVectorize(chooseNextExplore(iter, predicted, instance.getLabels()));
+				StringPrediction prediction = new StringPrediction(label, 1);
+				state.next(prediction);
+
+			}
+			else {
+				StringPrediction prediction = getModelPrediction(state, vector);
+				state.next(prediction);
+			}
 		}
 
 		if (isEvaluate()) state.evaluate(eval);
+	}
+
+	private int chooseNextExplore(int iter, int predicted, Set<Integer> zeroCosts) {
+		System.out.println(zeroCosts.toString());
+		if (iter > 2 && Math.random() > .1)
+			return predicted;
+		else if (zeroCosts.contains(predicted))
+			return predicted;
+		else
+			return (Integer)zeroCosts.toArray()[new Random().nextInt(zeroCosts.size())];
+
 	}
 
 	/** @return the oracle prediction for training; otherwise, the model predict. */
@@ -187,7 +215,6 @@ public abstract class NLPComponent<N,S extends NLPState<N>> implements Serializa
 	{
 		return isTrain() ? new StringPrediction(state.getOraclePrediction(), 1) : getModelPrediction(state, vector);
 	}
-
 	/** @return the vector consisting of all features extracted from the state. */
 	protected StringVector extractFeatures()
 	{

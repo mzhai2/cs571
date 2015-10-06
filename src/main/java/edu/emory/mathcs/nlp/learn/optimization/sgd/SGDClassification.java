@@ -19,6 +19,8 @@ import edu.emory.mathcs.nlp.learn.vector.IndexValuePair;
 import edu.emory.mathcs.nlp.learn.vector.Vector;
 import edu.emory.mathcs.nlp.learn.weight.WeightVector;
 
+import java.util.Set;
+
 /**
  * @author Jinho D. Choi ({@code jinho.choi@emory.edu})
  */
@@ -58,6 +60,21 @@ public abstract class SGDClassification extends StochasticGradientDescent
 				average_vector.add(yp, xi.getIndex(), gp * steps);
 				average_vector.add(yn, xi.getIndex(), gn * steps);
 			}
+		}
+	}
+
+	protected void update(Set<Integer> yps, int yn, Vector x)
+	{
+		double gp, gn;
+
+		for (IndexValuePair xi : x)
+		{
+			for (int yp: yps) {
+				gp =  getGradient(yp, xi.getIndex()) * xi.getValue();
+				weight_vector.add(yp, xi.getIndex(), gp);
+			}
+			gn = -getGradient(yn, xi.getIndex()) * xi.getValue();
+			weight_vector.add(yn, xi.getIndex(), gn);
 		}
 	}
 	

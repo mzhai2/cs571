@@ -30,7 +30,12 @@ public class Perceptron extends SGDClassification
 	{
 		super(weightVector, average, learningRate);
 	}
-	
+
+	@Override
+	protected int updateMultinomialOnline(Instance instance) {
+		return 0;
+	}
+
 	@Override
 	protected void updateBinomial(Instance instance)
 	{

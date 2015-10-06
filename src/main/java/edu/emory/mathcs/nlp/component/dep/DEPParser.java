@@ -66,9 +66,8 @@ public class DEPParser<N extends DEPNode> extends NLPComponent<N,DEPState<N>>
 		models[0].addInstance(new StringInstance(label, vector));
 	}
 	@Override
-	protected void addInstance(Set<String> label, StringVector vector)
+	protected void addInstance(Set<String> labels, StringVector vector)
 	{
-		for (String l : label)
-			models[0].addInstance(new StringInstance(l, vector));
+		models[0].addInstance(new StringInstance(labels, vector));
 	}
 }

@@ -16,6 +16,7 @@
 package edu.emory.mathcs.nlp.learn.util;
 
 import java.io.Serializable;
+import java.util.Set;
 
 
 /**
@@ -26,20 +27,31 @@ public class StringPrediction implements Serializable
 	private static final long serialVersionUID = 4629812694101207696L;
 	private String label;
 	private double score;
+	private Set<String> labels;
 	
 	public StringPrediction(String label, double score)
 	{
 		set(label, score);
 	}
-	
+	public StringPrediction(Set<String> labels, double score)
+	{
+		set(labels, score);
+	}
 	public String getLabel()
 	{
 		return label;
 	}
-
+	public Set<String> getLabels()
+	{
+		return labels;
+	}
 	public void setLabel(String label)
 	{
 		this.label = label;
+	}
+	public void setLabels(Set<String> labels)
+	{
+		this.labels= labels;
 	}
 
 	public double getScore()
@@ -55,6 +67,12 @@ public class StringPrediction implements Serializable
 	public void set(String label, double score)
 	{
 		setLabel(label);
+		setScore(score);
+	}
+
+	public void set(Set<String> labels, double score)
+	{
+		setLabels(labels);
 		setScore(score);
 	}
 	
