@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import edu.emory.mathcs.nlp.learn.optimization.sgd.StochasticGradientDescent;
 import edu.emory.mathcs.nlp.learn.util.Instance;
 import edu.emory.mathcs.nlp.learn.weight.WeightVector;
 
@@ -52,10 +53,13 @@ public abstract class OnlineOptimizer extends Optimizer
 		train(instances, 1);
 	}
 
-	public int trainOnline(Instance instance)
-	{
-		return trainOnline(instance);
-	}
+	abstract public int trainOnline(Instance instance);
+
+//
+// 	public int trainOnline(Instance instance)
+//	{
+//		return trainOnline(instance);
+//	}
 	
 	/** Shuffles the trainign instances. */
 	public void shuffle(List<Instance> instances)

@@ -56,6 +56,11 @@ public class AdaDeltaMiniBatch extends AdaptiveMiniBatch
 	}
 
 	@Override
+	public int trainOnline(Instance instance) {
+		return 0;
+	}
+
+	@Override
 	protected int updateMultinomialOnline(Instance instance) {
 		return 0;
 	}

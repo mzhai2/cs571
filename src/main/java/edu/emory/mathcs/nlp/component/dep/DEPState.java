@@ -126,11 +126,17 @@ public class DEPState<N extends DEPNode> extends NLPState<N>
 		Set<String> legal = getLegal();
 		Set<String> valids = new HashSet<>();
 
+		DEPArc o = oracle[stack.topInt()];
+		String label = o.getLabel();
+
 		if (legal.contains(LEFT_ARC) && zeroCostLeft()) {
-			valids.add(LEFT_ARC);
+			valids.add(LEFT_ARC + o.getLabel());
 		}
+
+		o = oracle[input];
+
 		if (legal.contains(RIGHT_ARC) && zeroCostRight()) {
-			valids.add(RIGHT_ARC);
+			valids.add(RIGHT_ARC + o.getLabel());
 		}
 		if (legal.contains(SHIFT) && zeroCostShift()) {
 			valids.add(SHIFT);
