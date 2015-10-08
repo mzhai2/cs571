@@ -74,9 +74,15 @@ public class AdaGradTrunc extends SGDClassification
 			for (IndexValuePair p : x) {
 				possiblePenalty.toArray()[weight_vector.labelSize()*p.getIndex() + yn] += l1 *getGradient(yp, p.getIndex());
 				possiblePenalty.toArray()[weight_vector.labelSize()*p.getIndex() + yp] += l1 *getGradient(yp, p.getIndex());
+
+				double gp = getGradient(yp, p.getIndex()) * p.getValue();
+				double gn = -getGradient(yn, p.getIndex()) * p.getValue();
+				weight_vector.add(yp, p.getIndex(), gp);
+				weight_vector.add(yn, p.getIndex(), gn);
+				applyPenalty(weight_vector.labelSize()*p.getIndex()+yp);
+				applyPenalty(weight_vector.labelSize()*p.getIndex()+yn);
 			}
 		}
-		updateWeight(instance);
 
 	}
 
@@ -101,33 +107,6 @@ public class AdaGradTrunc extends SGDClassification
 		join.add("learning rate = "+learning_rate);
 
 		return "AdaGradTrunc: "+join.toString();
-	}
-
-	public void updateWeight(Instance instance) {
-
-		Vector x = instance.getVector();
-		int   yp = instance.getLabel();
-		int   yn = multinomialBestHingeLoss(instance);
-
-		if (yp != yn)
-		{
-
-			updateDiagonals(yp, x);
-			updateDiagonals(yn, x);
-			update(yp, yn, x);
-
-			for (IndexValuePair xi : x)
-			{
-				double gp = getGradient(yp, xi.getIndex()) * xi.getValue();
-				double gn = -getGradient(yn, xi.getIndex()) * xi.getValue();
-				weight_vector.add(yp, xi.getIndex(), gp);
-				weight_vector.add(yn, xi.getIndex(), gn);
-				applyPenalty(weight_vector.labelSize()*xi.getIndex()+yp);
-				applyPenalty(weight_vector.labelSize()*xi.getIndex()+yn);
-			}
-
-		}
-
 	}
 
 	private void applyPenalty(int index) {
