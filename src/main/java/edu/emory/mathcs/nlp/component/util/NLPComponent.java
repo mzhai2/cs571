@@ -157,7 +157,7 @@ public abstract class NLPComponent<N,S extends NLPState<N>> implements Serializa
 	{
 		S state = createState(nodes);
 		feature_template.setState(state);
-		if (!isDecode()) state.saveOracle(); // why? doesnt this clear the gold?
+		if (!isDecode()) state.saveOracle();
 		
 		while (!state.isTerminate())
 		{

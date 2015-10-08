@@ -51,7 +51,13 @@ public class DEPState<N extends DEPNode> extends NLPState<N>
 	@Override
 	public void saveOracle()
 	{
-		oracle = Arrays.stream(nodes).map(n -> n.clearDependencies()).toArray(DEPArc[]::new);
+		oracle = new DEPArc[nodes.length];
+
+		for (int i=0; i<nodes.length; i++)
+		{
+			oracle[i] = nodes[i].clearDependencies();
+		}
+//		oracle = Arrays.stream(nodes).map(n -> n.clearDependencies()).toArray(DEPArc[]::new);
 	}
 
 	@Override
@@ -59,13 +65,17 @@ public class DEPState<N extends DEPNode> extends NLPState<N>
 	{
 		DEPArc o = oracle[stack.topInt()];
 
+		if (o.isLabel("ARTROOT"))
+			return SHIFT;
 		// left-arc: input is the head of stack
 		if (o.isNode(getInput(0)))
 			return LEFT_ARC + o.getLabel();
 		
 		// right-arc: stack is the head of input
 		o = oracle[input];
-		
+		if (o.isLabel("ARTROOT"))
+			return SHIFT;
+
 		if (o.isNode(getStack(0)))
 			return RIGHT_ARC + o.getLabel();
 		
@@ -316,12 +326,10 @@ public class DEPState<N extends DEPNode> extends NLPState<N>
 
 
 //	====================================== TRANSITION ======================================
-	
 	@Override
 	public void next(StringPrediction prediction)
 	{
 		String label = prediction.getLabel();
-//		System.out.println(label+" "+stack.toString()+" "+input);
 
 		if (label.startsWith(LEFT_ARC))
 		{

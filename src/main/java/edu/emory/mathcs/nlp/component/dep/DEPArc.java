@@ -26,7 +26,10 @@ public class DEPArc extends AbstractArc<DEPNode>
 
 	public DEPArc(DEPNode node, String label)
 	{
-		set(node, label);
+		if (node == null && label == null)
+			set(new DEPNode(0,"ARTROOT"), "ARTROOT");
+		else
+			set(node, label);
 	}
 
 	@Override

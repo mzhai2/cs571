@@ -52,9 +52,9 @@ public class DEPIndex implements TSVIndex<DEPNode>
 	{
 		int i, size = values.size();
 		DEPNode[] nodes = new DEPNode[size+1];
-		
+
 		nodes[0] = new DEPNode();
-		
+
 		for (i=1; i<=size; i++)
 			nodes[i] = create(values.get(i-1), i);
 		
