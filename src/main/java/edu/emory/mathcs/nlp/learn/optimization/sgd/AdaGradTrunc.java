@@ -48,16 +48,6 @@ public class AdaGradTrunc extends SGDClassification
 	@Override
 	protected void updateBinomial(Instance instance)
 	{
-		Vector x = instance.getVector();
-		int   yp = instance.getLabel();
-		int   yn = binomialBestHingeLoss(instance);
-
-		if (yp != yn)
-		{
-			yp *= 2 - 1; // yp = {0, 1} -> {-1, 1}
-			updateDiagonals(yp, x);
-			update(yp, x);
-		}
 	}
 
 	@Override
@@ -66,24 +56,22 @@ public class AdaGradTrunc extends SGDClassification
 		Vector x = instance.getVector();
 		int   yp = instance.getLabel();
 		int   yn = multinomialBestHingeLoss(instance);
-
+		int labelSize = weight_vector.labelSize();
 		if (yp != yn)
 		{
 			updateDiagonals(yp, x);
 			updateDiagonals(yn, x);
 			for (IndexValuePair p : x) {
-				possiblePenalty.toArray()[weight_vector.labelSize()*p.getIndex() + yn] += l1 *getGradient(yp, p.getIndex());
-				possiblePenalty.toArray()[weight_vector.labelSize()*p.getIndex() + yp] += l1 *getGradient(yp, p.getIndex());
-
+				possiblePenalty.toArray()[labelSize*p.getIndex() + yp] += l1*getGradient(yp, p.getIndex());
+				possiblePenalty.toArray()[labelSize*p.getIndex() + yn] += l1*getGradient(yn, p.getIndex());
 				double gp = getGradient(yp, p.getIndex()) * p.getValue();
 				double gn = -getGradient(yn, p.getIndex()) * p.getValue();
 				weight_vector.add(yp, p.getIndex(), gp);
 				weight_vector.add(yn, p.getIndex(), gn);
-				applyPenalty(weight_vector.labelSize()*p.getIndex()+yp);
-				applyPenalty(weight_vector.labelSize()*p.getIndex()+yn);
+				applyPenalty(labelSize*p.getIndex()+yp);
+				applyPenalty(labelSize*p.getIndex()+yn);
 			}
 		}
-
 	}
 
 	private void updateDiagonals(int y, Vector x)
@@ -115,9 +103,8 @@ public class AdaGradTrunc extends SGDClassification
 		float u = possiblePenalty.toArray()[index];
 		if (z > 0)
 			weight_vector.toArray()[index] = Math.max(0, z-(u+qi));
-		else if (z < 0)
+		else
 			weight_vector.toArray()[index] = Math.min(0, z+(u-qi));
 		penaltySum.toArray()[index] += weight_vector.toArray()[index]-z;
-
 	}
 }
