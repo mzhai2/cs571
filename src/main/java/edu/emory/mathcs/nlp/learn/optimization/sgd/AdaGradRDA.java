@@ -29,7 +29,7 @@ import java.util.StringJoiner;
 public class AdaGradRDA extends SGDClassification
 {
     protected final float epsilon = 0.00001f;
-    protected WeightVector diagonals;
+    protected WeightVector squaredSum;
     protected WeightVector sumGradients;
     protected int count;
     protected float l1;
@@ -47,11 +47,11 @@ public class AdaGradRDA extends SGDClassification
     public AdaGradRDA(WeightVector weightVector, boolean average, float learningRate)
     {
         super(weightVector, average, learningRate);
-        diagonals = weightVector.createEmptyVector();
+        squaredSum = weightVector.createEmptyVector();
         sumGradients = weightVector.createEmptyVector();
         count = 1;
 
-        l1 = 0.00001f;
+        l1 = 0.0001f;
         enhancer =0;
         gamma = 1000;
     }
@@ -73,23 +73,25 @@ public class AdaGradRDA extends SGDClassification
             updateDiagonals(yp, x);
             updateDiagonals(yn, x);
             updateSumGradients(yp, yn, x);
-            updateRDA();
+            updateRDA(yp,yn,x);
         }
-        if (count %1000 == 0)
-        System.out.println(count);
         count++;
+
+//        if (count %1000 == 0)
+//        System.out.println(count);
     }
 
     private void updateDiagonals(int y, Vector x)
     {
-        for (IndexValuePair p : x)
-            diagonals.add(y, p.getIndex(), MathUtils.sq(p.getValue()));
+        for (IndexValuePair p : x) {
+            squaredSum.add(y, p.getIndex(), MathUtils.sq(p.getValue()));
+        }
     }
 
     @Override
     protected float getGradient(int y, int xi)
     {
-        return (float) (learning_rate / (epsilon + Math.sqrt(diagonals.get(y, xi))));
+        return (float) (learning_rate / (epsilon + Math.sqrt(squaredSum.get(y, xi))));
     }
 
     @Override
@@ -106,37 +108,36 @@ public class AdaGradRDA extends SGDClassification
     }
 
     private void updateSumGradients(int yp,int yn, Vector x) {
-        double gp, gn;
-
         for (IndexValuePair xi : x)
         {
-            gp =  getGradient(yp, xi.getIndex()) * xi.getValue();
-            gn = -getGradient(yn, xi.getIndex()) * xi.getValue();
-            sumGradients.add(yp, xi.getIndex(), gp);
-            sumGradients.add(yn, xi.getIndex(), gn);
+            sumGradients.add(yp, xi.getIndex(), xi.getValue());
+            sumGradients.add(yn, xi.getIndex(), -xi.getValue());
         }
     }
 
-    protected void updateRDA()
+    protected void updateRDA(int yp, int yn, Vector x)
     {
-        float RDA = l1;
-//        + enhancer/(float)Math.sqrt(count);
 
-        float[] grad = sumGradients.toArray();
-        for (int i=0; i<grad.length; i++) {
-            if (grad[i] < 0.00001)
-                continue;
-            float mod = Math.abs(grad[i])/count - RDA;
-//            System.out.println(mod);
-            if (mod < 0)
-                continue;
-            if (mod == 0) {
-                weight_vector.toArray()[i] = 0;
-            }
-            else {
-                weight_vector.toArray()[i] = signum(grad[i]) * learning_rate * count / diagonals.toArray()[i] * mod;
-            }
+        for (IndexValuePair xi : x)
+        {
+            float gp = shrink(sumGradients.get(yp, xi.getIndex()));
+            float gn = shrink(sumGradients.get(yn, xi.getIndex()));
+            weight_vector.add(yp, xi.getIndex(), getGradient(yp, xi.getIndex())*gp);
+            weight_vector.add(yn, xi.getIndex(), getGradient(yn, xi.getIndex())*gn);
         }
+    }
+
+    private float shrink(float g) {
+        float a = count*l1;
+        if (g>0 && g>a)
+        {
+            return g-a;
+        }
+        if (g<0 && Math.abs(g)>a)
+        {
+            return g+a;
+        }
+        return 0;
     }
 
     private float signum(float f) {
