@@ -27,7 +27,7 @@ import edu.emory.mathcs.nlp.learn.weight.WeightVector;
  */
 public class LogisticRegression extends StochasticGradientDescent
 {
-	public LogisticRegression(WeightVector weightVector, boolean average, double learningRate)
+	public LogisticRegression(WeightVector weightVector, boolean average, float learningRate)
 	{
 		super(weightVector, average, learningRate);
 	}

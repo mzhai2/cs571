@@ -36,7 +36,7 @@ public class AdaGradTrunc extends SGDClassification
 	protected double l1 = 0.00001;
 
 
-	public AdaGradTrunc(WeightVector weightVector, boolean average, double learningRate, double l1)
+	public AdaGradTrunc(WeightVector weightVector, boolean average, float learningRate, double l1)
 	{
 		super(weightVector, average, learningRate);
 		diagonals = weightVector.createEmptyVector();
@@ -81,9 +81,9 @@ public class AdaGradTrunc extends SGDClassification
 	}
 
 	@Override
-	protected double getGradient(int y, int xi)
+	protected float getGradient(int y, int xi)
 	{
-		return learning_rate / (epsilon + Math.sqrt(diagonals.get(y, xi)));
+		return (float) (learning_rate / (epsilon + Math.sqrt(diagonals.get(y, xi))));
 	}
 
 	@Override

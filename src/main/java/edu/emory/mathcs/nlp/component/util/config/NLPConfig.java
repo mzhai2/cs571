@@ -151,7 +151,7 @@ public abstract class NLPConfig<N> implements ConfigXML
 	private Perceptron getPerceptron(Element eOptimizer, StringModel model)
 	{
 		boolean average      = XMLUtils.getBooleanTextContentFromFirstElementByTagName(eOptimizer, AVERAGE);
-		double  learningRate = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, LEARNING_RATE);
+		float  learningRate = (float) XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, LEARNING_RATE);
 		
 		return new Perceptron(model.getWeightVector(), average, learningRate);
 	}
@@ -159,7 +159,7 @@ public abstract class NLPConfig<N> implements ConfigXML
 	private AdaGrad getAdaGrad(Element eOptimizer, StringModel model)
 	{
 		boolean average      = XMLUtils.getBooleanTextContentFromFirstElementByTagName(eOptimizer, AVERAGE);
-		double  learningRate = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, LEARNING_RATE);
+		float  learningRate = (float) XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, LEARNING_RATE);
 
 		return new AdaGrad(model.getWeightVector(), average, learningRate);
 	}
@@ -167,7 +167,7 @@ public abstract class NLPConfig<N> implements ConfigXML
 	private AdaGradRDA getAdaGradRDA(Element eOptimizer, StringModel model)
 	{
 		boolean average      = XMLUtils.getBooleanTextContentFromFirstElementByTagName(eOptimizer, AVERAGE);
-		double  learningRate = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, LEARNING_RATE);
+		float  learningRate = (float) XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, LEARNING_RATE);
 
 		return new AdaGradRDA(model.getWeightVector(), average, learningRate);
 	}
@@ -175,7 +175,7 @@ public abstract class NLPConfig<N> implements ConfigXML
 	private AdaGradTrunc getAdaGradTrunc(Element eOptimizer, StringModel model)
 	{
 		boolean average      = XMLUtils.getBooleanTextContentFromFirstElementByTagName(eOptimizer, AVERAGE);
-		double  learningRate = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, LEARNING_RATE);
+		float  learningRate = (float) XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, LEARNING_RATE);
 		double l1			 = XMLUtils.getDoubleTextContentFromFirstElementByTagName(eOptimizer, L1);
 		return new AdaGradTrunc(model.getWeightVector(), average, learningRate, l1);
 	}
@@ -184,7 +184,7 @@ public abstract class NLPConfig<N> implements ConfigXML
 	{
 		double  batchRatio   = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, BATCH_RATIO);
 		boolean average      = XMLUtils.getBooleanTextContentFromFirstElementByTagName(eOptimizer, AVERAGE);
-		double  learningRate = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, LEARNING_RATE);
+		float  learningRate = (float) XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, LEARNING_RATE);
 		
 		return new AdaGradMiniBatch(model.getWeightVector(), batchRatio, average, learningRate);
 	}
@@ -193,7 +193,7 @@ public abstract class NLPConfig<N> implements ConfigXML
 	{
 		double  batchRatio   = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, BATCH_RATIO);
 		boolean average      = XMLUtils.getBooleanTextContentFromFirstElementByTagName(eOptimizer, AVERAGE);
-		double  learningRate = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, LEARNING_RATE);
+		float  learningRate = (float) XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, LEARNING_RATE);
 		double  decayingRate = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, DECAYING_RATE);
 
 		return new AdaDeltaMiniBatch(model.getWeightVector(), batchRatio, average, learningRate, decayingRate);

@@ -28,7 +28,7 @@ import edu.emory.mathcs.nlp.learn.weight.WeightVector;
 public abstract class OnlineOptimizer extends Optimizer
 {
 	protected WeightVector average_vector;
-	protected final double learning_rate;
+	protected final float learning_rate;
 	protected Random random;
 	protected int steps;
 	
@@ -37,7 +37,7 @@ public abstract class OnlineOptimizer extends Optimizer
 	 * @param average if true, use averaged SGD.
 	 * @param learningRate the learning rate.
 	 */
-	public OnlineOptimizer(WeightVector weightVector, boolean average, double learningRate)
+	public OnlineOptimizer(WeightVector weightVector, boolean average, float learningRate)
 	{
 		super(weightVector, OptimizerType.ONLINE);
 		average_vector = average ? weightVector.createEmptyVector() : null;

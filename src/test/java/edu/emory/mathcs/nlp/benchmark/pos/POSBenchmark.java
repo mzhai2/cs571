@@ -88,7 +88,7 @@ public class POSBenchmark
 		model.vectorize(label_cutoff, feature_cutoff, false);
 		
 		// train the statistical model
-		final double learning_rate = 0.02;
+		final float learning_rate = 0.02f;
 		final int epochs = 200;
 		
 		WeightVector weight = model.getWeightVector();

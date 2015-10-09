@@ -28,13 +28,13 @@ import java.util.StringJoiner;
  */
 public class AdaGradRDA extends SGDClassification
 {
-    protected final double epsilon = 0.00001;
+    protected final float epsilon = 0.00001f;
     protected WeightVector diagonals;
-    protected WeightVector averageGradient;
+    protected WeightVector sumGradients;
     protected int count;
-    protected double l1;
-    protected double gamma;
-    protected double enhancer;
+    protected float l1;
+    protected float gamma;
+    protected float enhancer;
 
     // l1 = lambda 0.01 to 10
     // l1 RDA gamma=5000 rho =0
@@ -44,16 +44,16 @@ public class AdaGradRDA extends SGDClassification
     //
 
 
-    public AdaGradRDA(WeightVector weightVector, boolean average, double learningRate)
+    public AdaGradRDA(WeightVector weightVector, boolean average, float learningRate)
     {
         super(weightVector, average, learningRate);
         diagonals = weightVector.createEmptyVector();
-        averageGradient = weightVector.createEmptyVector();
+        sumGradients = weightVector.createEmptyVector();
         count = 1;
 
-        l1 = 0.01;
+        l1 = 0.00001f;
         enhancer =0;
-        gamma = 5000;
+        gamma = 1000;
     }
 
     @Override
@@ -72,10 +72,11 @@ public class AdaGradRDA extends SGDClassification
         {
             updateDiagonals(yp, x);
             updateDiagonals(yn, x);
-            updateAverageGradient(yp, yn, x);
-            update(yp, yn, x);
+            updateSumGradients(yp, yn, x);
+            updateRDA();
         }
-        updateRDA();
+        if (count %1000 == 0)
+        System.out.println(count);
         count++;
     }
 
@@ -86,16 +87,15 @@ public class AdaGradRDA extends SGDClassification
     }
 
     @Override
-    protected double getGradient(int y, int xi)
+    protected float getGradient(int y, int xi)
     {
-        return learning_rate / (epsilon + Math.sqrt(diagonals.get(y, xi)));
+        return (float) (learning_rate / (epsilon + Math.sqrt(diagonals.get(y, xi))));
     }
 
     @Override
     public String toString()
     {
         StringJoiner join = new StringJoiner(", ");
-
         join.add("average = "+isAveraged());
         join.add("learning rate = "+learning_rate);
         join.add("l1 = " + l1);
@@ -105,49 +105,68 @@ public class AdaGradRDA extends SGDClassification
         return "AdaGradRDA: "+join.toString();
     }
 
-    private void updateAverageGradient(int yp,int yn, Vector x) {
-        float term = (count-1)/count;
-        for (int i=0;i<averageGradient.toArray().length;i++) {
-            averageGradient.toArray()[i] = term*averageGradient.toArray()[i];
-        }
+    private void updateSumGradients(int yp,int yn, Vector x) {
         double gp, gn;
 
         for (IndexValuePair xi : x)
         {
-            gp =  getGradient(yp, xi.getIndex()) * xi.getValue()/count;
-            gn = -getGradient(yn, xi.getIndex()) * xi.getValue()/count;
-            averageGradient.add(yp, xi.getIndex(), gp);
-            averageGradient.add(yn, xi.getIndex(), gn);
+            gp =  getGradient(yp, xi.getIndex()) * xi.getValue();
+            gn = -getGradient(yn, xi.getIndex()) * xi.getValue();
+            sumGradients.add(yp, xi.getIndex(), gp);
+            sumGradients.add(yn, xi.getIndex(), gn);
         }
     }
 
     protected void updateRDA()
     {
-        double RDA = l1 + enhancer/Math.sqrt(count);
+        float RDA = l1;
+//        + enhancer/(float)Math.sqrt(count);
 
-        float[] grad = averageGradient.toArray();
+        float[] grad = sumGradients.toArray();
         for (int i=0; i<grad.length; i++) {
-            double partial = grad[i];
-            if (Math.abs(partial) >= RDA)
-                weight_vector.toArray()[i] += regularizeGradientRDA(partial, RDA);
+            if (grad[i] < 0.00001)
+                continue;
+            float mod = Math.abs(grad[i])/count - RDA;
+//            System.out.println(mod);
+            if (mod < 0)
+                continue;
+            if (mod == 0) {
+                weight_vector.toArray()[i] = 0;
+            }
+            else {
+                weight_vector.toArray()[i] = signum(grad[i]) * learning_rate * count / diagonals.toArray()[i] * mod;
+            }
         }
     }
 
-    protected void updateElastic(int yp, int yn, Vector x)
-    {
-        float[] grad = averageGradient.toArray();
-        for (int i=0; i<grad.length; i++) {
-            double partial = grad[i];
-            if (Math.abs(partial) >= l1)
-                weight_vector.toArray()[i] += regularizeGradientElastic(partial, l1, 0.01);
-        }
-    }
+    private float signum(float f) {
+        if (f<0)
+            return -1;
+        else if (f==0)
+            return 0;
+        else
+            return 1;
 
-    private double regularizeGradientRDA(double gradient, double RDA) {
-        return Math.sqrt(count)/gamma*gradient-RDA*Math.signum(gradient);
     }
+//    protected void updateElastic(int yp, int yn, Vector x)
+//    {
+//        float[] grad = averageGradient.toArray();
+//        for (int i=0; i<grad.length; i++) {
+//            double partial = grad[i];
+//            if (Math.abs(partial) >= l1)
+//                weight_vector.toArray()[i] += regularizeGradientElastic(partial, l1, 0.01);
+//        }
+//    }
+//
+//    private double regularizeGradientRDA(double partial, double RDA) {
+//        return Math.sqrt(count)/gamma*partial-RDA*Math.signum(partial);
+//    }
+//
+//    private double regularizeGradientElastic(double partial, double l1, double convexity) {
+//        return gamma*partial-l1*Math.signum(partial)/convexity;
+//    }
 
-    private double regularizeGradientElastic(double gradient, double l1, double convexity) {
-        return gamma*gradient-l1*Math.signum(gradient)/convexity;
+    private double regularizeGradientRDA(double partial, double RDA) {
+        return Math.signum(-partial) * count * partial - Math.max(0, RDA * Math.abs(partial));
     }
 }

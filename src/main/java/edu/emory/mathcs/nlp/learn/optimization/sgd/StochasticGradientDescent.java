@@ -26,7 +26,7 @@ import edu.emory.mathcs.nlp.learn.weight.WeightVector;
  */
 public abstract class StochasticGradientDescent extends OnlineOptimizer
 {
-	public StochasticGradientDescent(WeightVector weightVector, boolean average, double learningRate)
+	public StochasticGradientDescent(WeightVector weightVector, boolean average, float learningRate)
 	{
 		super(weightVector, average, learningRate);
 	}

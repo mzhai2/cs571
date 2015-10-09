@@ -43,7 +43,7 @@ public class PerceptronRDA extends SGDClassification
     //
 
 
-    public PerceptronRDA(WeightVector weightVector, boolean average, double learningRate)
+    public PerceptronRDA(WeightVector weightVector, boolean average, float learningRate)
     {
         super(weightVector, average, learningRate);
         averageGradient = weightVector.createEmptyVector();
@@ -76,7 +76,7 @@ public class PerceptronRDA extends SGDClassification
     }
 
     @Override
-    protected double getGradient(int y, int xi)
+    protected float getGradient(int y, int xi)
     {
         return learning_rate;
     }

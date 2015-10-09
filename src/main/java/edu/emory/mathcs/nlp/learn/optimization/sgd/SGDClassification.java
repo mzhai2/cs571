@@ -24,7 +24,7 @@ import edu.emory.mathcs.nlp.learn.weight.WeightVector;
  */
 public abstract class SGDClassification extends StochasticGradientDescent
 {
-	public SGDClassification(WeightVector weightVector, boolean average, double learningRate)
+	public SGDClassification(WeightVector weightVector, boolean average, float learningRate)
 	{
 		super(weightVector, average, learningRate);
 	}
@@ -61,5 +61,5 @@ public abstract class SGDClassification extends StochasticGradientDescent
 		}
 	}
 	
-	protected abstract double getGradient(int y, int xi);
+	protected abstract float getGradient(int y, int xi);
 }

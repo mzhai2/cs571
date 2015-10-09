@@ -31,7 +31,7 @@ public class AdaGrad extends SGDClassification
     protected final double epsilon = 0.00001;
     protected WeightVector diagonals;
 
-    public AdaGrad(WeightVector weightVector, boolean average, double learningRate)
+    public AdaGrad(WeightVector weightVector, boolean average, float learningRate)
     {
         super(weightVector, average, learningRate);
         diagonals = weightVector.createEmptyVector();
@@ -74,9 +74,9 @@ public class AdaGrad extends SGDClassification
     }
 
     @Override
-    protected double getGradient(int y, int xi)
+    protected float getGradient(int y, int xi)
     {
-        return learning_rate / (epsilon + Math.sqrt(diagonals.get(y, xi)));
+        return (float) (learning_rate / (epsilon + Math.sqrt(diagonals.get(y, xi))));
     }
 
     @Override

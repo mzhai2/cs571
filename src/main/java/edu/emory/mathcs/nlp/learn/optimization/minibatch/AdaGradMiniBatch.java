@@ -25,7 +25,7 @@ import edu.emory.mathcs.nlp.learn.weight.WeightVector;
  */
 public class AdaGradMiniBatch extends AdaptiveMiniBatch
 {
-	public AdaGradMiniBatch(WeightVector weightVector, double batchRatio, boolean average, double learningRate)
+	public AdaGradMiniBatch(WeightVector weightVector, double batchRatio, boolean average, float learningRate)
 	{
 		super(weightVector, batchRatio, average, learningRate);
 	}

@@ -35,7 +35,7 @@ public abstract class AdaptiveMiniBatch extends OnlineOptimizer
 	protected WeightVector gradients;
 	protected int batch_size;
 	
-	public AdaptiveMiniBatch(WeightVector weightVector, double batchRatio, boolean average, double learningRate)
+	public AdaptiveMiniBatch(WeightVector weightVector, double batchRatio, boolean average, float learningRate)
 	{
 		super(weightVector, average, learningRate);
 		diagonals   = weightVector.createEmptyVector();
@@ -134,7 +134,7 @@ public abstract class AdaptiveMiniBatch extends OnlineOptimizer
 		for (int i=0; i<w.length; i++)
 			w[i] += learning_rate / (epsilon + Math.sqrt(d[i])) * g[i];
 	}
-	
+
 	private void updateAverageVector()
 	{
 		average_vector.add(weight_vector);

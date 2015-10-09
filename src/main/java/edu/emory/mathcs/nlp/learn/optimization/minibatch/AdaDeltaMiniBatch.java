@@ -28,7 +28,7 @@ public class AdaDeltaMiniBatch extends AdaptiveMiniBatch
 	protected final double decaying_rate;
 	protected final double growth_rate;
 
-	public AdaDeltaMiniBatch(WeightVector weightVector, double batchRatio, boolean average, double learningRate, double decayingRate)
+	public AdaDeltaMiniBatch(WeightVector weightVector, double batchRatio, boolean average, float learningRate, double decayingRate)
 	{
 		super(weightVector, batchRatio, average, learningRate);
 		decaying_rate = decayingRate;

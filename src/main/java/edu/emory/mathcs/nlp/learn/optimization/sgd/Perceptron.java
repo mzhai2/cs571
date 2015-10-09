@@ -26,7 +26,7 @@ import edu.emory.mathcs.nlp.learn.weight.WeightVector;
  */
 public class Perceptron extends SGDClassification
 {
-	public Perceptron(WeightVector weightVector, boolean average, double learningRate)
+	public Perceptron(WeightVector weightVector, boolean average, float learningRate)
 	{
 		super(weightVector, average, learningRate);
 	}
@@ -50,7 +50,7 @@ public class Perceptron extends SGDClassification
 	}
 	
 	@Override
-	protected double getGradient(int y, int xi)
+	protected float getGradient(int y, int xi)
 	{
 		return learning_rate;
 	}

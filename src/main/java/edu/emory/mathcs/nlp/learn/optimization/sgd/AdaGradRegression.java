@@ -25,7 +25,7 @@ import edu.emory.mathcs.nlp.learn.weight.WeightVector;
  */
 public class AdaGradRegression extends StochasticGradientDescent
 {
-	public AdaGradRegression(WeightVector weightVector, boolean average, double learningRate)
+	public AdaGradRegression(WeightVector weightVector, boolean average, float learningRate)
 	{
 		super(weightVector, average, learningRate);
 	}
