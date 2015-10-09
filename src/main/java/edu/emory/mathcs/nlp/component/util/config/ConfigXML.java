@@ -63,6 +63,7 @@ public interface ConfigXML
 	String MAX_TOLERANCE	= "max_tolerance";
 	String LOSS_TYPE		= "loss_type";
 	String THREAD_SIZE		= "thread_size";
+	String WINDOW			= "window";
 	
 //	========================== ALGORITHMS ==========================
 	
@@ -71,4 +72,5 @@ public interface ConfigXML
 	String ADAGRAD_MINI_BATCH	= "adagrad-mini-batch";
 	String ADADELTA_MINI_BATCH	= "adadelta-mini-batch";
 	String LIBLINEAR_L2_SVC		= "liblinear-l2-svc";
+	String ADADELTA				= "adadelta";
 }

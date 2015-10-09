@@ -51,6 +51,6 @@ public class AdaDeltaMiniBatch extends AdaptiveMiniBatch
 		join.add("learning rate = "+learning_rate);
 		join.add("decaying rate = "+decaying_rate);
 		
-		return "AdaDelta: "+join.toString();
+		return "AdaDelta-minibatch: "+join.toString();
 	}
 }

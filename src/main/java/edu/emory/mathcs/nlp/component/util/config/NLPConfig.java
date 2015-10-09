@@ -15,6 +15,7 @@
  */
 package edu.emory.mathcs.nlp.component.util.config;
 
+import edu.emory.mathcs.nlp.learn.optimization.sgd.AdaDelta;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
@@ -123,11 +124,12 @@ public abstract class NLPConfig<N> implements ConfigXML
 		
 		switch (algorithm)
 		{
-		case PERCEPTRON         : return getPerceptron       (eOptimizer, model);
-		case ADAGRAD            : return getAdaGrad          (eOptimizer, model);
-		case ADAGRAD_MINI_BATCH : return getAdaGradMiniBatch (eOptimizer, model);
-		case ADADELTA_MINI_BATCH: return getAdaDeltaMiniBatch(eOptimizer, model);
-		case LIBLINEAR_L2_SVC   : return getLiblinearL2SVC   (eOptimizer, model);
+			case PERCEPTRON         : return getPerceptron       (eOptimizer, model);
+			case ADAGRAD            : return getAdaGrad          (eOptimizer, model);
+			case ADADELTA            : return getAdaDelta          (eOptimizer, model);
+			case ADAGRAD_MINI_BATCH : return getAdaGradMiniBatch (eOptimizer, model);
+			case ADADELTA_MINI_BATCH: return getAdaDeltaMiniBatch(eOptimizer, model);
+			case LIBLINEAR_L2_SVC   : return getLiblinearL2SVC   (eOptimizer, model);
 		}
 		
 		throw new IllegalArgumentException(algorithm+" is not a valid algorithm name.");
@@ -159,7 +161,17 @@ public abstract class NLPConfig<N> implements ConfigXML
 		
 		return new AdaGrad(model.getWeightVector(), average, learningRate);
 	}
-	
+
+	private AdaDelta getAdaDelta(Element eOptimizer, StringModel model)
+	{
+		boolean average      = XMLUtils.getBooleanTextContentFromFirstElementByTagName(eOptimizer, AVERAGE);
+		double  learningRate = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, LEARNING_RATE);
+		double  decayingRate = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, DECAYING_RATE);
+		int  	window		 = XMLUtils.getIntegerTextContentFromFirstElementByTagName(eOptimizer, WINDOW);
+
+		return new AdaDelta(model.getWeightVector(), average, learningRate, decayingRate, window);
+	}
+
 	private AdaGradMiniBatch getAdaGradMiniBatch(Element eOptimizer, StringModel model)
 	{
 		double  batchRatio   = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, BATCH_RATIO);

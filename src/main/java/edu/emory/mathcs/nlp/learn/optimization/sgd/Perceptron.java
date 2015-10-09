@@ -50,7 +50,7 @@ public class Perceptron extends SGDClassification
 	}
 	
 	@Override
-	protected double getGradient(int y, int xi)
+	protected double getAdjustedLearningRate(int y, int xi)
 	{
 		return learning_rate;
 	}

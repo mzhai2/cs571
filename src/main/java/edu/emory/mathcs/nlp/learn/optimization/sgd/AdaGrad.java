@@ -74,7 +74,7 @@ public class AdaGrad extends SGDClassification
 	}
 	
 	@Override
-	protected double getGradient(int y, int xi)
+	protected double getAdjustedLearningRate(int y, int xi)
 	{
 		return learning_rate / (epsilon + Math.sqrt(diagonals.get(y, xi)));
 	}

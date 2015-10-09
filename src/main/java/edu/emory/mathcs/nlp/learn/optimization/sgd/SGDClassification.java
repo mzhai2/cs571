@@ -35,7 +35,7 @@ public abstract class SGDClassification extends StochasticGradientDescent
 		
 		for (IndexValuePair xi : x)
 		{
-			g = y * getGradient(y, xi.getIndex()) * xi.getValue();
+			g = y * getAdjustedLearningRate(y, xi.getIndex()) * xi.getValue();
 			weight_vector.add(y, xi.getIndex(), g);
 			if (isAveraged()) average_vector.add(y, xi.getIndex(), g * steps);
 		}
@@ -47,8 +47,8 @@ public abstract class SGDClassification extends StochasticGradientDescent
 		
 		for (IndexValuePair xi : x)
 		{
-			gp =  getGradient(yp, xi.getIndex()) * xi.getValue();
-			gn = -getGradient(yn, xi.getIndex()) * xi.getValue();
+			gp =  getAdjustedLearningRate(yp, xi.getIndex()) * xi.getValue();
+			gn = -getAdjustedLearningRate(yn, xi.getIndex()) * xi.getValue();
 			
 			weight_vector.add(yp, xi.getIndex(), gp);
 			weight_vector.add(yn, xi.getIndex(), gn);
@@ -61,5 +61,5 @@ public abstract class SGDClassification extends StochasticGradientDescent
 		}
 	}
 	
-	protected abstract double getGradient(int y, int xi);
+	protected abstract double getAdjustedLearningRate(int y, int xi);
 }
