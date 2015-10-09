@@ -165,7 +165,7 @@ public abstract class NLPTrain<N,S extends NLPState<N>>
 
 			int nonEmpty = 0;
 			for (float f :component.getModels()[0].getWeightVector().toArray())
-				if (f!=0)
+				if (f>.00001)
 					nonEmpty++;
 			BinUtils.LOG.info(String.format("%3d: %5.2f nonEmpty: %d\n", epoch, currScore, nonEmpty));
 		}

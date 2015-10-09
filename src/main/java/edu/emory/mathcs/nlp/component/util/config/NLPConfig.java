@@ -15,6 +15,7 @@
  */
 package edu.emory.mathcs.nlp.component.util.config;
 
+import edu.emory.mathcs.nlp.learn.optimization.sgd.AdaGradRDA;
 import edu.emory.mathcs.nlp.learn.optimization.sgd.AdaGradTrunc;
 import edu.emory.mathcs.nlp.learn.optimization.sgd.AdaGrad;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -126,7 +127,8 @@ public abstract class NLPConfig<N> implements ConfigXML
 		{
 			case PERCEPTRON         : return getPerceptron       (eOptimizer, model);
 			case ADAGRADTRUNC       : return getAdaGradTrunc(eOptimizer, model);
-			case ADAGRAD            : return getAdaGrad          (eOptimizer, model);
+			case ADAGRAD            : return getAdaGrad(eOptimizer, model);
+			case ADAGRADRDA			: return getAdaGradRDA(eOptimizer, model);
 			case ADAGRAD_MINI_BATCH : return getAdaGradMiniBatch (eOptimizer, model);
 			case ADADELTA_MINI_BATCH: return getAdaDeltaMiniBatch(eOptimizer, model);
 			case LIBLINEAR_L2_SVC   : return getLiblinearL2SVC   (eOptimizer, model);
@@ -153,19 +155,28 @@ public abstract class NLPConfig<N> implements ConfigXML
 		
 		return new Perceptron(model.getWeightVector(), average, learningRate);
 	}
-	
+
 	private AdaGrad getAdaGrad(Element eOptimizer, StringModel model)
 	{
 		boolean average      = XMLUtils.getBooleanTextContentFromFirstElementByTagName(eOptimizer, AVERAGE);
 		double  learningRate = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, LEARNING_RATE);
-		
+
 		return new AdaGrad(model.getWeightVector(), average, learningRate);
 	}
+
+	private AdaGradRDA getAdaGradRDA(Element eOptimizer, StringModel model)
+	{
+		boolean average      = XMLUtils.getBooleanTextContentFromFirstElementByTagName(eOptimizer, AVERAGE);
+		double  learningRate = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, LEARNING_RATE);
+
+		return new AdaGradRDA(model.getWeightVector(), average, learningRate);
+	}
+
 	private AdaGradTrunc getAdaGradTrunc(Element eOptimizer, StringModel model)
 	{
 		boolean average      = XMLUtils.getBooleanTextContentFromFirstElementByTagName(eOptimizer, AVERAGE);
 		double  learningRate = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, LEARNING_RATE);
-		double l1			 = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, L1);
+		double l1			 = XMLUtils.getDoubleTextContentFromFirstElementByTagName(eOptimizer, L1);
 		return new AdaGradTrunc(model.getWeightVector(), average, learningRate, l1);
 	}
 	
@@ -177,7 +188,7 @@ public abstract class NLPConfig<N> implements ConfigXML
 		
 		return new AdaGradMiniBatch(model.getWeightVector(), batchRatio, average, learningRate);
 	}
-	
+
 	private AdaDeltaMiniBatch getAdaDeltaMiniBatch(Element eOptimizer, StringModel model)
 	{
 		double  batchRatio   = XMLUtils.getDoubleTextContentFromFirstElementByTagName (eOptimizer, BATCH_RATIO);
