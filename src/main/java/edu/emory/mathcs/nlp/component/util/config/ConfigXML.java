@@ -69,6 +69,7 @@ public interface ConfigXML
 	
 	String PERCEPTRON			= "perceptron";
 	String ADAGRAD				= "adagrad";
+	String ADAGRADRDA			= "adagrad-rda";
 	String ADAGRADTRUNC			= "adagrad-trunc";
 	String ADAGRAD_MINI_BATCH	= "adagrad-mini-batch";
 	String ADADELTA_MINI_BATCH	= "adadelta-mini-batch";
