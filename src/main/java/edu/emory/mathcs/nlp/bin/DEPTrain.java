@@ -78,6 +78,7 @@ public class DEPTrain extends NLPTrain<DEPNode,DEPState<DEPNode>>
 	
 	static public void main(String[] args)
 	{
+		org.apache.log4j.BasicConfigurator.configure();
 		new DEPTrain(args).train();
 	}
 }
