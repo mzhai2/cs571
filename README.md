@@ -1,7 +1,7 @@
 Malt Model: [Download](https://drive.google.com/file/d/0B3akpSg7pbnLUlBWVjUyLUdaOEk/view?usp=sharing)
 Stanford Model: [Download](https://drive.google.com/file/d/0B3akpSg7pbnLQkNfWmNEZXdHaUE/view?usp=sharing)
 
-###In order to train the dependency parser, you will need to call the `DEPTrain` class under the this projec and provide sufficient information for training the parser.
+####To train project, you must call the DEPTrain class.
 
 ```
 edu.emory.mathcs.nlp.bin.DEPTrain
@@ -21,6 +21,7 @@ edu.emory.mathcs.nlp.bin.DEPTrain
 
 
 ###The following is an example for a configuration model for the Malt parser.
+
 ```
 <configuration>
 <language>english</language>
@@ -35,12 +36,13 @@ edu.emory.mathcs.nlp.bin.DEPTrain
 </tsv>
 
 <optimizer>
-<algorithm>adagrad</algorithm>
+<algorithm>adagrad-mini-batch</algorithm>
 <label_cutoff>4</label_cutoff>
-<feature_cutoff>2</feature_cutoff>
+<feature_cutoff>7	</feature_cutoff>
 <reset_weights>false</reset_weights>
 <average>false</average>
-<learning_rate>0.02</learning_rate>
+<learning_rate>0.09</learning_rate>
+<batch_ratio>0.1</batch_ratio>
 <bias>0.1</bias>
 </optimizer>
 
