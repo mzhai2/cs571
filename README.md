@@ -38,12 +38,12 @@ edu.emory.mathcs.nlp.bin.DEPTrain
 <optimizer>
 <algorithm>adagrad-mini-batch</algorithm>
 <label_cutoff>4</label_cutoff>
-<feature_cutoff>7	</feature_cutoff>
+<feature_cutoff>7</feature_cutoff>
 <reset_weights>false</reset_weights>
 <average>false</average>
 <learning_rate>0.09</learning_rate>
 <batch_ratio>0.1</batch_ratio>
-<bias>0.1</bias>
+<bias>1</bias>
 </optimizer>
 
 <aggregate tolerance_delta="0.01" max_tolerance="5"/>
