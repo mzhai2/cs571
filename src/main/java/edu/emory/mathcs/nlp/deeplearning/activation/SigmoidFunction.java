@@ -15,20 +15,19 @@
  */
 package edu.emory.mathcs.nlp.deeplearning.activation;
 
+import edu.emory.mathcs.nlp.common.util.Sigmoid;
+
 /**
  * @author Jinho D. Choi ({@code jinho.choi@emory.edu})
  */
 public class SigmoidFunction implements ActivationFunction
 {
-	private final float[] table;
-	private final float   floor, ceiling;
-	private final float   table_multiply;
-	private final int     table_adjust;
+	private Sigmoid table;
 	
 	/** Calls {@link #SigmoidFunction(int, float, float)}, where size = 3500, floor = -6, ceiling = 6. */
 	public SigmoidFunction()
 	{
-		this(3500, -6, 6);
+		table = new Sigmoid();
 	}
 	
 	/**
@@ -38,22 +37,12 @@ public class SigmoidFunction implements ActivationFunction
 	 */
 	public SigmoidFunction(int size, float floor, float ceiling)
 	{
-		this.floor   = floor;
-		this.ceiling = ceiling;
-		this.table   = new float[size];
-		
-		float range = ceiling - floor;
-		
-		table_adjust   = (int)(0.5 - floor * (size - 1) / range);
-		table_multiply = (float)(size - 1) / range;
-		
-        for (int i=0; i<size; ++i)
-            table[i] = (float)(1d / (1d + Math.exp(6d * (floor + ceiling - 2d * (floor + range * i / (size - 1))) / range)));
+		table = new Sigmoid(size, floor, ceiling);
 	}
 	
 	public final double get(double d)
 	{
-		return (d <= floor) ? 0 : (d >= ceiling) ? 1 : table[(int)(d*table_multiply) + table_adjust];
+		return table.get(d);
 	}
 	
 	@Override

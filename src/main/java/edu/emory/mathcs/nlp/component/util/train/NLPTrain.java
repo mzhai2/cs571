@@ -148,7 +148,7 @@ public abstract class NLPTrain<N,S extends NLPState<N>>
 	{
 		Eval eval = component.getEval();
 		double prevScore = 0, currScore;
-		float[] prevWeight = null;
+		float[] prevWeight = model.getWeightVector().toArray();
 		
 		for (int epoch=1; ;epoch++)
 		{
